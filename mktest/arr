@@ -1,11 +1,25 @@
 #!/bin/bash
 
+# bare minimum needed to work
+if [ -z "$CTL_ROOT" ]; then
+  echo "mkarrtest: CTL_ROOT undefined" 2>&1
+  exit 1
+fi
+if [ -z "$CTL_ENV" ]; then
+  echo "mkarrtest: CTL_ENV undefined" 2>&1
+  exit 1
+fi
+
 # grab environment
-source "$CTL_ROOT/env"
+source "$CTL_ENV"
+
+# bring in library
+source "$CTL_BASH_LIB"
+
+do_or_die echo "/* $CTL_AUTO_GEN_MSG */" >"$CTL_ROOT/test/do/arr.c"
 
 awk -v SILENT=$silent '
 BEGIN {
-  print "/* AUTO-GENERATED!! DO NOT MODIFY */"
   FS = ","
 }
 
@@ -41,4 +55,4 @@ END {
   printf("\tprintf(\"PASS\\n\");\n")
   print "}"
 }
-' "$CTL_ROOT/mktest/tab/arr" >"$CTL_ROOT/test/do/arr.c"
+' "$CTL_ROOT/mktest/tab/arr" >>"$CTL_ROOT/test/do/arr.c"

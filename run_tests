@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# bare minimum needed to work
+if [ -z "$CTL_ROOT" ]; then
+  echo "run_tests: CTL_ROOT undefined" 2>&1
+  exit 1
+fi
+if [ -z "$CTL_ENV" ]; then
+  echo "run_tests: CTL_ENV undefined" 2>&1
+  exit 1
+fi
+
 # get test name from path
 #
 # args:
@@ -31,7 +41,7 @@ test_name() {
 }
 
 # source our environment
-source "$CTL_ROOT/env"
+source "$CTL_ENV"
 
 # source our bash library
 source "$CTL_BASH_LIB"

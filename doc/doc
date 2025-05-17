@@ -1,53 +1,113 @@
 #!/bin/bash
 
+# bare minimum needed to work
+if [ -z "$CTL_ROOT" ]; then
+  echo "doc: CTL_ROOT undefined" 2>&1
+  exit 1
+fi
+if [ -z "$CTL_ENV" ]; then
+  echo "doc: CTL_ENV undefined" 2>&1
+  exit 1
+fi
+
+# verbose mode?
+v=${1:-0}
+
 # grab environment
-source "$CTL_ROOT/env"
+source "$CTL_ENV"
 
 # source our bash library
 source "$CTL_BASH_LIB"
+
+# print message if in verbose mode
+#
+# args:
+#  @msg: message
+verbose() {
+  do_verbose "$(basename $0): $1" "$v"
+}
+
+verbose 'generating docs...'
 
 # templates
 tmps=(
   'arr' # dynamic array
 )
 
+for ((i = 0; i < ${#tmps[@]}; i++)); do
+  verbose "tmps[$i] = \"${tmps[i]}\""
+done
+
 # setup arch directory if needed
 if ! [ -d "$CTL_ARCH" ]; then
+  verbose "\"$CTL_ARCH\" not directory"
   if [ -e "$CTL_ARCH" ]; then
-    do_or_die rm -f "$CTL_ARCH"
+    verbose "\"$CTL_ARCH\" something else, removing it"
+    do_or_die rm "$CTL_ARCH"
   fi
   # create arch directory
+  verbose "creating \"$CTL_ARCH\""
   do_or_die mkdir "$CTL_ARCH"
-  # move project structure files to arch
-  do_or_die mv "$CTL_ROOT/dirtree" "$CTL_ARCH/dirtree"
-  do_or_die mv "$CTL_ROOT/dirpic" "$CTL_ARCH/dirpic"
 fi
 
-# for each template
-for tmp in "${tmps[@]}"; do
-  tmpdir="$CTL_ARCH/$tmp" # template doc directory
-  tmpsrc="$CTL_TMP/$tmp"  # template source
-  func="${tmp^^}_DEF"     # template function name
-  priv="$tmpdir/priv"     # private member doc file
-  pub="$tmpdir/pub"       # public member doc file
-  hdr="hdr/$tmp"          # template doc header
+# move project structure files to arch if they are not already there
+verbose "copying \"$CTL_PIC\" to \"$CTL_ARCH/pic\""
+do_or_die cp "$CTL_PIC" "$CTL_ARCH/pic"
+verbose "copying \"$CTL_TREE\" to \"$CTL_ARCH/tree\""
+do_or_die cp "$CTL_TREE" "$CTL_ARCH/tree"
 
-  if ! [ -d "$tmpdir" ]; then
-    if [ -e "$tmpdir" ]; then
-    fi
+verbose 'generating doc for each template...'
+# for each template
+for ((i = 0; i < ${#tmps[@]}; i++)); do
+  tmp="${tmps[i]}"            # template name
+  hdr="$CTL_DOC_GEN/hdr/$tmp" # template doc header
+  tmpdir="$CTL_ARCH/$tmp"     # template doc directory
+  tmpsrc="$CTL_TMP/$tmp.h"    # template source
+  func="CTL_${tmp^^}_DEF"     # template function name
+  priv="$tmpdir/priv"         # private member doc file
+  pub="$tmpdir/pub"           # public member doc file
+
+  verbose "tmps[$i].name = \"$tmp\""
+  verbose "tmps[$i].func = \"$func\""
+  verbose "tmps[$i].priv = \"$priv\""
+  verbose "tmps[$i].hdr  = \"$hdr\""
+  verbose "tmps[$i].dir  = \"$tmpdir\""
+  verbose "tmps[$i].src  = \"$tmpsrc\""
+  verbose "tmps[$i].pub  = \"$pub\""
+
+  # fail if no header
+  if ! [ -e "$hdr" ]; then
+    echo "\"$tmp\" does not have a header yet" >&2
+    exit 1
   fi
 
-  # create doc directory for template
-  do_or_die mkdir "$tmpdir"
+  # if doc directory for template not already there
+  if ! [ -d "$tmpdir" ]; then
+    verbose "\"$tmpdir\" not directory"
+    if [ -e "$tmpdir" ]; then
+      verbose "\"$tmpdir\" something else, removing it"
+      do_or_die rm "$tmpdir"
+    fi
+    verbose "creating \"$tmpdir\""
+    do_or_die mkdir "$tmpdir"
+  fi
 
   # write header to private and public member files
-  do_or_die cp "$hdr" "$priv"
-  do_or_die cp "$hdr" "$pub"
+  verbose "copying \"$hdr\" to \"$priv\""
+  do_or_die echo "AUTO-GENERATED!!! DO NOT MODIFY" >"$priv"
+  do_or_die cat "$hdr" >>"$priv"
+
+  verbose "copying \"$hdr\" to \"$pub\""
+  do_or_die echo "AUTO-GENERATED!!! DO NOT MODIFY" >"$pub"
+  do_or_die cat "$hdr" >>"$pub"
 
   # generate doc
-  do_or_die ./doc.awk \
-    -v FUNC="$func"   \
-    -v PUB="$pub"     \
-    -v PRIV="$priv"   \
+  verbose "running \"$CTL_DOC_GEN/doc.awk\" on \"$tmpsrc\" with FUNC=\"$func\", PUB=\"$pub\", PRIV=\"$priv\""
+  do_or_die "$CTL_DOC_GEN/doc.awk" \
+    -v FUNC="$func"                \
+    -v PUB="$pub"                  \
+    -v PRIV="$priv"                \
     "$tmpsrc"
+
+  verbose "\"$tmp\" doc created"
 done

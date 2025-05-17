@@ -1,3 +1,4 @@
+AUTO-GENERATED!!! DO NOT MODIFY
 =========================
 ARR_DEF(link, type, name)
 =========================
@@ -8,3 +9,103 @@ args:
  @link: linkage of generated functions
  @type: type of array elements
  @name: name of generated struct and prefix of all function names
+=========================================
+private  ${name}_grow(struct ${name} *ap)
+=========================================
+info:
+   grow ${name}
+
+  args:
+   @ap: pointer to ${name}
+
+  ret:
+   @success: 0
+   @failure: -1 and errno set
+===================================================
+private  ${name}_grow_if_needed(struct ${name} *ap)
+===================================================
+info:
+   grow ${name} if needed
+
+  args:
+   @ap: pointer to ${name}
+
+  ret:
+   @success: 0
+   @failure: -1 and errno set
+===========================================
+private  ${name}_shrink(struct ${name} *ap)
+===========================================
+info:
+   shrink ${name}
+
+  args:
+   @ap: pointer to ${name}
+
+  ret:
+   @success: 0
+   @failure: -1 and errno set
+=====================================================
+private  ${name}_shrink_if_needed(struct ${name} *ap)
+=====================================================
+info:
+   shrink ${name} if needed
+
+  args:
+   @ap: pointer to ${name}
+
+  ret:
+   @success: 0
+   @failure: -1 and errno set
+========================================================
+private  ${name}_grow_by(struct ${name} *ap, size_t amt)
+========================================================
+info:
+   grow ${name} by amount
+
+  args:
+   @ap:  pointer to ${name}
+   @amt: amount
+
+  ret:
+   @success: 0
+   @failure: -1 and errno set
+==================================================================
+private  ${name}_grow_by_if_needed(struct ${name} *ap, size_t amt)
+==================================================================
+info:
+   grow ${name} by amount if needed
+
+  args:
+   @ap:  pointer to ${name}
+   @amt: amount
+
+  ret:
+   @success: 0
+   @failure: -1 and errno set
+==========================================================
+private  ${name}_shrink_by(struct ${name} *ap, size_t amt)
+==========================================================
+info:
+   shrink ${name} by amount
+
+  args:
+   @ap:  pointer to ${name}
+   @amt: amount
+
+  ret:
+   @success: 0
+   @failure: -1 and errno set
+====================================================================
+private  ${name}_shrink_by_if_needed(struct ${name} *ap, size_t amt)
+====================================================================
+info:
+   shrink ${name} by amount if needed
+
+  args:
+   @ap:  pointer to ${name}
+   @amt: amount
+
+  ret:
+   @success: 0
+   @failure: -1 and errno set

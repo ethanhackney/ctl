@@ -1,6 +1,7 @@
 #!/usr/bin/awk -f
 
 BEGIN {
+  # make sure we got what we needed
   if (!FUNC) {
     print "doc.awk: no function given"
     exit 1
@@ -13,108 +14,61 @@ BEGIN {
     print "doc.awk: no private file given"
     exit 1
   }
-
-  # regex for function macro we want
-  def = "^#define " FUNC
-
-  print "AUTO-GENERATED!! DO NOT MODIFY"
+  # character used for barrier
+  BARRIER = "="
+  # did we find the function?
+  found = 0
 }
 
-# definition found
-$0 ~ def {
-  # flag as in def
-  in_def = 1
+# skip until template function found
+!found && $0 !~ "^#define " FUNC {
   next
 }
 
-# end of definition
-in_def && /[^\\]$/ {
+# gotcha
+!found {
+  found = 1
+}
+
+# end of def?
+/[^\\]$/ {
   # exit when we are finished with def
-  exit
+  exit 0
 }
 
-# in def
-in_def {
-  # remove leading space
-  gsub(/^ */, "")
-
-  # remove trailing space and backslash
-  gsub(/ *\\$/, "")
-
-  # convert to interpolation syntax
-  gsub(/_name/, "${name}")
-  gsub(/_type/, "${type}")
-  gsub(/ ## /, "")
+# comment?
+/\*\*/ {
+  in_comment = 1
+  next
 }
 
-# in def and hit function comment
-in_def && /^\/\*\*$/ {
-  # flag as in fn comment
-  in_fn_comment = 1
+# end of comment?
+in_comment && /\*\// {
+  in_comment = 0
+  next
 }
 
-# in definition and hit a public function
-in_fn_comment && /^PUBLIC/ {
-  gen(PUB)
+# still in comment?
+in_comment {
+  comment[++nc] = parse($0)
+  next
 }
 
-# in definition and hit a private function
-in_fn_comment && /^PRIVATE/ {
-  gen(PRIV)
+# function signature?
+/^(PUBLIC|PRIVATE)/ {
+  pub = match($0, /^PUBLIC/)
+  out = pub ? PUB : PRIV
+  sig = pub ? "public " : "private "
+  in_sig = 1
+  next
 }
 
-# in a function comment
-in_fn_comment && /^\*[^//]/ {
-  # remove *
-  gsub(/\*/, "")
-  # add comment to comment list
-  comment[++nc] = $0
-}
-
-# trim leading and trailing space
-function trim() {
-  # remove leading space
-  gsub(/^ */, " ")
-  # remove trailing space and backslash
-  gsub(/ *\\$/, "")
-}
-
-# print string n times
-function repeat(s, n, out) {
-  for (i = 1; i <= n; i++)
-    printf("%s", s) >>out
-  printf("\n") >>out
-}
-
-# build up function signature
-function sig(s) {
-  # visibility
-  if (s ~ /^PUBLIC/) {
-    s = "public " $0
-  } else {
-    s = "private " $0
-  }
-
-  # while more arguments
-  while (getline > 0 && /^[^{]/) {
-    trim()
-    # add argument to signature
-    s = s $0
-  }
-
-  # done
-  return s
-}
-
-# generate doc for function
-function gen(out) {
-  # parse function signature
-  s = sig()
-
-  # print signature in between barrier
-  repeat("=", length(s), out)
-  print s >>out
-  repeat("=", length(s), out)
+# at end of sig?
+in_sig && /\{/ {
+  # print sig in between barriers
+  barrier(length(sig), out)
+  print sig >>out
+  barrier(length(sig), out)
 
   # first comment holds description of function
   info = comment[1]
@@ -127,6 +81,48 @@ function gen(out) {
     print comment[c] >>out
 
   # start over
-  in_fn_comment = 0
+  in_sig = 0
   nc = 0
+  next
+}
+
+# still in sig?
+in_sig {
+  sig = sig parse($0)
+}
+
+# parse string
+function parse(s) {
+  s = trim(s)
+  s = interp(s)
+  return s
+}
+
+# trim the fat
+function trim(s) {
+  gsub(/^ *\*?/, " ", s)
+  gsub(/ *\\$/, "", s)
+  return s
+}
+
+# convert to interpolation syntax used in docs
+function interp(s) {
+  gsub(/_name/, "${name}", s)
+  gsub(/_type/, "${type}", s)
+  gsub(/ ## /, "", s)
+  return s
+}
+
+# print string n times
+function barrier(n, out) {
+  for (i = 1; i <= n; i++)
+    printf(BARRIER, s) >>out
+  printf("\n") >>out
+}
+
+END {
+  if (!found) {
+    print "doc.awk: could not find \"#define " FUNC "\""
+    exit 1
+  }
 }

@@ -1,12 +1,20 @@
 #!/bin/bash
 
-# one thing we need
+# bare minimum needed to work
 if [ -z "$CTL_ROOT" ]; then
   echo "env: CTL_ROOT undefined" 2>&1
   exit 1
 fi
+if [ -z "$CTL_ENV" ]; then
+  echo "env: CTL_ENV undefined" 2>&1
+  exit 1
+fi
 
-export CTL_BASH_LIB="$CTL_ROOT/bashlib" # bash library
-export CTL_ARCH="$CTL_ROOT/arch"        # project docs
-export CTL_LIB="$CTL_ROOT/lib/lib.c"    # libraries
-export CTL_TMP="$CTL_ROOT/tmp"          # templates
+export CTL_AUTO_GEN_MSG="AUTO-GENERATED! DO NOT MODIFY" # gen file header 
+export CTL_TREE="$CTL_ROOT/.projtree"                   # project directory tree info
+export CTL_PIC="$CTL_ROOT/.projpic"                     # project directory tree picture
+export CTL_BASH_LIB="$CTL_ROOT/bashlib"                 # bash library
+export CTL_DOC_GEN="$CTL_ROOT/doc"                      # documentation generator
+export CTL_ARCH="$CTL_ROOT/arch"                        # project docs
+export CTL_LIB="$CTL_ROOT/lib/lib.c"                    # libraries
+export CTL_TMP="$CTL_ROOT/tmp"                          # templates

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# run command line and die if it fails
+# run command line and die if it fails:
 #
 # args:
 #  @cmd: command line
@@ -13,20 +13,25 @@ do_or_die() {
   fi
 }
 
-# mkdir if not already directory:
+# write message to stderr:
 #
 # args:
-#  @path: path
-mkdir_if_not() {
-  local path="$1"
+#  @msg: message to write
+stderr() {
+  do_or_die printf "$1" >&2
+  do_or_die printf "\n"
+}
 
-  # is already directory
-  if [ -d "$path" ]; then
-    return
-  fi
+# write message to stderr if v != 0:
+#
+# args:
+#  @msg: message to write
+#  @v:   verbose mode?
+do_verbose() {
+  local msg="$1"
+  local v="$2"
 
-  # exists, but not directory
-  if [ -e "$path" ]; then
-    do_or_die rm -f "$path"
+  if [ "$v" -ne 0 ]; then
+    stderr "$msg"
   fi
 }
