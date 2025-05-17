@@ -1,31 +1,31 @@
 [ $ROOT ]
-        |
-        +-->[ misc files ]
-        |
-        +-->[ test ]
-        |       |
-        |       +-->[ test files ]
-        |       |
-        |       +-->[ do ]
-        |             |
-        |             +-->[ auto generated tests ]
-        |
-        +--->[ doc ]
-        |       |
-        |       +--->[ doc generator scripts ]
-        |
-        +--->[ tmp ]
-        |       |
-        |       +--->[ templates ]
-        |
-        +--->[ lib ]
-        |       |
-        |       +--->[ library code ]
-        |
-        +--->[ mktest ]
-                |
-                +--->[ test generator scripts ]
-                               |
-                               +--->[ tab ]
-                                       |
-                                       +-->[ tables for test generators ]
+    |
+    +-->[ misc files ]
+    |
+    +-->[ test ]
+    |       |
+    |       +-->[ test files ]
+    |       |
+    |       +-->[ do ]
+    |             |
+    |             +-->[ auto generated tests ]
+    |
+    +--->[ doc ]
+    |       |
+    |       +--->[ doc generator scripts ]
+    |
+    +--->[ tmp ]
+    |       |
+    |       +--->[ templates ]
+    |
+    +--->[ lib ]
+    |       |
+    |       +--->[ library code ]
+    |
+    +--->[ mktest ]
+            |
+            +--->[ test generator scripts ]
+            |
+            +--->[ tab ]
+                    |
+                    +-->[ tables for test generators ]
