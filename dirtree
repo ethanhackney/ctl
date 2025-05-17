@@ -1,0 +1,26 @@
+ROOT=$HOME/code/ctl # root directory
+
+ROOT/run_tests # run tests
+ROOT/Makefile  # makefile
+ROOT/env       # environment variables
+
+ROOT/doc         # scripts for generating documentation
+ROOT/doc/doc     # script for generating all docs
+ROOT/doc/doc.awk # script for generating 1 doc
+
+ROOT/tmp       # templates
+ROOT/tmp/arr.h # dynamic array
+
+ROOT/lib       # library code
+ROOT/lib/lib.h # main library header
+ROOT/lib/lib.c # main library source
+
+ROOT/mktest         # scripts for generating tests
+ROOT/mktest/arr     # script for generated dynamic array test
+ROOT/mktest/tab     # tables of data for test generators
+ROOT/mktest/tab/arr # table for dynamic array test generator
+
+ROOT/test          # tests directory
+ROOT/test/arr.c    # dynamic array test
+ROOT/test/do       # auto generated parts of test code
+ROOT/test/do/arr.c # auto generated tests for dynamic array
