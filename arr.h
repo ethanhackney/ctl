@@ -110,6 +110,33 @@
  * ret:
  *  @sucess:  0
  *  @failure: -1 and errno set
+ *
+ * ====================
+ * public ${name}_find:
+ *  linear search
+ * ====================
+ * args:
+ *  @ap:  pointer to ${name}
+ *  @v:   value to search for
+ *  @cmp: comparison function
+ *
+ * ========================
+ * public ${name}_bin_find:
+ *  binary search
+ * ========================
+ * args:
+ *  @ap:  pointer to ${name}
+ *  @v:   value to search for
+ *  @cmp: comparison function
+ *
+ * =======================
+ * public ${name}_bin_add:
+ *  binary insertion
+ * =======================
+ * args:
+ *  @ap:  pointer to ${name}
+ *  @v:   value to add
+ *  @cmp: comparison function
  */
 #ifndef ARR_H
 #define ARR_H
