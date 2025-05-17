@@ -24,13 +24,14 @@ arg_cmp(const void *app, const void *bpp)
 }
 
 /* dynamic array of strings */
-ARR_DEF(, char *, strvec)
+ARR_DEF(, char *, strvec, strcmp)
 
 int
 main(int argc, char **argv)
 {
         struct strvec args = {0};
         size_t idx = 0;
+        size_t i = 0;
         char **p = NULL;
         char *v = NULL;
         int ret = 0;
@@ -45,13 +46,25 @@ main(int argc, char **argv)
         if (strvec_addv(&args, 0, argv, argc) < 0)
                 die("main: strvec_addv");
 
-        if (strvec_rmv(&args, 0, NULL, argc) < 0)
-                die("main: strvec_rmv");
+        for (i = 0; i < args.len; i++) {
+                idx = strvec_find(&args, args.arr[i]);
+                if (idx == args.len)
+                        die("main: strvec_find");
+        }
+        idx = strvec_find(&args, "1");
+        if (idx != args.len)
+                die("main: strvec_find");
+
+        strvec_clear(&args);
 
         for (p = argv; *p != NULL; p++) {
-                idx = rand() % args.len;
-                if (strvec_add(&args, idx, *p) < 0)
-                        die("main: strvec_add");
+                if (strvec_bin_add(&args, *p) < 0)
+                        die("main: strvec_bin_add");
+        }
+
+        for (i = 0; i < args.len - 1; i++) {
+                if (strcmp(args.arr[i], args.arr[i + 1]) > 0)
+                        die("main: args not sorted");
         }
 
         for (;;) {
