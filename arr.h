@@ -4,7 +4,6 @@
  *  @link: linkage of generated functions
  *  @type: type of array elements
  *  @name: name of generated struct and prefix of all functions
- *  @cmp:  comparison function (can be function or macro)
  * ============================================================
  *
  * ====================
@@ -158,9 +157,8 @@
  *  @_link: linkage of generated functions
  *  @_type: type of array elements
  *  @_name: name of generated struct
- *  @_cmp:  comparison function (can be function or macro)
  */
-#define ARR_DEF(_link, _type, _name, _cmp)                      \
+#define ARR_DEF(_link, _type, _name)                            \
                                                                 \
 struct _name {                                                  \
         size_t  cap; /* physical length of array */             \
@@ -406,6 +404,10 @@ _name ## _pop(struct _name *ap, _type *vp)                      \
  * args:                                                        \
  *  @ap: pointer to _name                                       \
  *  @fn: comparison function                                    \
+ *   ret:                                                       \
+ *    < 0 if a < b                                              \
+ *    = 0 if a = b                                              \
+ *    > 0 if a > b                                              \
  */                                                             \
 _link void                                                      \
 _name ## _sort(struct _name *ap,                                \
@@ -711,8 +713,8 @@ _name ## _rmv(struct _name *ap,                                 \
  * args:                                                        \
  *  @ap: pointer to _name                                       \
  *  @v:  value to search for                                    \
- *  @fn: comparison function                                    \
- *   @ret:                                                      \
+ *  @cmp:                                                       \
+ *   ret:                                                       \
  *    < 0 if a < b                                              \
  *    = 0 if a = b                                              \
  *    > 0 if a > b                                              \
@@ -722,14 +724,16 @@ _name ## _rmv(struct _name *ap,                                 \
  *  @failure: one past last valid element                       \
  */                                                             \
 _link size_t                                                    \
-_name ## _find(const struct _name *ap, _type v)                 \
+_name ## _find(const struct _name *ap,                          \
+               _type v,                                         \
+               int (*cmp)(const _type, const _type))            \
 {                                                               \
         size_t i = 0;                                           \
                                                                 \
         ARR_OK(ap);                                             \
                                                                 \
         for (i = 0; i < ap->len; i++) {                         \
-                if (_cmp(ap->arr[i], v) == 0)                   \
+                if (cmp(ap->arr[i], v) == 0)                    \
                         break;                                  \
         }                                                       \
                                                                 \
@@ -741,19 +745,21 @@ _name ## _find(const struct _name *ap, _type v)                 \
  *                                                              \
  * args:                                                        \
  *  @ap: pointer to _name                                       \
- *  @v:  value to search for                                    \
- *  @fn: comparison function                                    \
- *   @ret:                                                      \
+ *  @v:  value to add                                           \
+ *  @cmp:                                                       \
+ *   ret:                                                       \
  *    < 0 if a < b                                              \
  *    = 0 if a = b                                              \
  *    > 0 if a > b                                              \
  *                                                              \
  * ret:                                                         \
  *  @success: 0                                                 \
- *  @failure: -1 and errno set                                  \
-*/                                                              \
-_link int                                                       \
-_name ## _bin_add(struct _name *ap, _type v)                    \
+ *  @failure: -1                                                \
+ */                                                             \
+_link size_t                                                    \
+_name ## _bin_add(struct _name *ap,                             \
+                  _type v,                                      \
+                  int (*cmp)(const _type, const _type))         \
 {                                                               \
         size_t low = 0;                                         \
         size_t high = 0;                                        \
@@ -772,7 +778,7 @@ _name ## _bin_add(struct _name *ap, _type v)                    \
         high = ap->len;                                         \
         while (low < high) {                                    \
                 mid = low + (high - low) / 2;                   \
-                diff = _cmp(ap->arr[mid], v);                   \
+                diff = cmp(ap->arr[mid], v);                    \
                 if (diff < 0)                                   \
                         low = mid + 1;                          \
                 else                                            \
@@ -802,6 +808,50 @@ _name ## _bin_add(struct _name *ap, _type v)                    \
 {                                                               \
         ARR_OK(ap);                                             \
         ap->len = 0;                                            \
+}                                                               \
+                                                                \
+/**                                                             \
+ * binary search on _name:                                      \
+ *                                                              \
+ * args:                                                        \
+ *  @ap: pointer to _name                                       \
+ *  @v:  value to search for                                    \
+ *  @cmp:                                                       \
+ *   ret:                                                       \
+ *    < 0 if a < b                                              \
+ *    = 0 if a = b                                              \
+ *    > 0 if a > b                                              \
+ *                                                              \
+ * ret:                                                         \
+ *  @success: index of element                                  \
+ *  @failure: one past last valid element                       \
+ */                                                             \
+_link size_t                                                    \
+_name ## _bin_find(const struct _name *ap,                      \
+                   _type v,                                     \
+                   int (*cmp)(const _type, const _type))        \
+{                                                               \
+        size_t low = 0;                                         \
+        size_t high = 0;                                        \
+        size_t mid = 0;                                         \
+        int diff = 0;                                           \
+                                                                \
+        ARR_OK(ap);                                             \
+                                                                \
+        low = 0;                                                \
+        high = ap->len;                                         \
+        while (low < high) {                                    \
+                mid = low + (high - low) / 2;                   \
+                diff = cmp(ap->arr[mid], v);                    \
+                if (diff < 0)                                   \
+                        low = mid + 1;                          \
+                else if (diff > 0)                              \
+                        high = mid;                             \
+                else                                            \
+                        return mid;                             \
+        }                                                       \
+                                                                \
+        return ap->len;                                         \
 }
 
 #endif /* #ifndef ARR_H */

@@ -7,6 +7,22 @@
 #include <stdio.h>
 
 /**
+ * compare two numbers:
+ *
+ * args:
+ *  @_a: first number
+ *  @_b: second number
+ *
+ * ret:
+ *  < 0 if _a < _b
+ *  = 0 if _a = _b
+ *  > 0 if _a > _b
+ */
+#define NUM_CMP(_a, _b) \
+        ((_a) <= (_b) ? ((_a) < (_b) ? -1 : 0) : 1)
+
+
+/**
  * print message + errno message and exit:
  *
  * args:

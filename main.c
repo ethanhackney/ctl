@@ -8,11 +8,6 @@
  * args:
  *  @app: pointer to first string
  *  @bpp: pointer to second string
- *
- * ret:
- *  < 0 if *app < *bpp
- *  = 0 if *app = *bpp
- *  > 0 if *app > *bpp
  */
 static int
 arg_cmp(const void *app, const void *bpp)
@@ -23,8 +18,8 @@ arg_cmp(const void *app, const void *bpp)
         return strcmp(a, b);
 }
 
-/* dynamic array of strings */
-ARR_DEF(, char *, strvec, strcmp)
+ARR_DEF(, char *, strvec)
+ARR_DEF(, int, intvec)
 
 int
 main(int argc, char **argv)
@@ -47,18 +42,16 @@ main(int argc, char **argv)
                 die("main: strvec_addv");
 
         for (i = 0; i < args.len; i++) {
-                idx = strvec_find(&args, args.arr[i]);
-                if (idx == args.len)
+                if (strvec_find(&args, args.arr[i], strcmp) == args.len)
                         die("main: strvec_find");
         }
-        idx = strvec_find(&args, "1");
-        if (idx != args.len)
+        if (strvec_find(&args, "1", strcmp) != args.len)
                 die("main: strvec_find");
 
         strvec_clear(&args);
 
         for (p = argv; *p != NULL; p++) {
-                if (strvec_bin_add(&args, *p) < 0)
+                if (strvec_bin_add(&args, *p, strcmp) < 0)
                         die("main: strvec_bin_add");
         }
 
@@ -67,17 +60,23 @@ main(int argc, char **argv)
                         die("main: args not sorted");
         }
 
+        for (i = 0; i < args.len; i++) {
+                if (strvec_bin_find(&args, args.arr[i], strcmp) == args.len)
+                        die("main: strvec_bin_find");
+        }
+        if (strvec_bin_find(&args, "1", strcmp) != args.len)
+                die("main: strvec_bin_find");
+
         for (;;) {
+                if (args.len == 0)
+                        break;
+
                 idx = rand() % args.len;
                 ret = strvec_rm(&args, idx, &v);
 
                 if (ret < 0)
                         die("main: strvec_rm");
                 if (ret > 0)
-                        break;
-
-                puts(v);
-                if (args.len == 0)
                         break;
         }
 
