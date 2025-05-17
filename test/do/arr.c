@@ -1,3 +1,4 @@
+/* AUTO-GENERATED!! DO NOT MODIFY */
 CMP_DEF(u64arr, uint64_t)
 ARR_TEST(uint64_t, u64arr, u64arr_cmp)
 CMP_DEF(u32arr, uint32_t)
@@ -23,18 +24,28 @@ ARR_TEST(char *, strarr, strcmp)
 void
 test(void)
 {
-	u64arr_test()
-	u32arr_test()
-	u16arr_test()
-	u8arr_test()
-	_test()
-	s64arr_test()
-	s32arr_test()
-	s16arr_test()
-	s8arr_test()
-	_test()
-	doublearr_test()
-	floatarr_test()
-	_test()
-	strarr_test()
+	printf("ARR_DEF tests running...\n");
+	u64arr_test();
+	printf("PASSED: u64arr_test");
+	u32arr_test();
+	printf("PASSED: u32arr_test");
+	u16arr_test();
+	printf("PASSED: u16arr_test");
+	u8arr_test();
+	printf("PASSED: u8arr_test");
+	s64arr_test();
+	printf("PASSED: s64arr_test");
+	s32arr_test();
+	printf("PASSED: s32arr_test");
+	s16arr_test();
+	printf("PASSED: s16arr_test");
+	s8arr_test();
+	printf("PASSED: s8arr_test");
+	doublearr_test();
+	printf("PASSED: doublearr_test");
+	floatarr_test();
+	printf("PASSED: floatarr_test");
+	strarr_test();
+	printf("PASSED: strarr_test");
+	printf("PASS\n");
 }

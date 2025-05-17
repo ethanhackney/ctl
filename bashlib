@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# run command line and die if it fails
+#
+# args:
+#  @cmd: command line
+do_or_die() {
+  "$@"
+  local stat=$?
+  if [ $stat -ne 0 ]; then
+    echo "command failed: $@" >&2
+    exit $stat
+  fi
+}
+
+# mkdir if not already directory:
+#
+# args:
+#  @path: path
+mkdir_if_not() {
+  local path="$1"
+
+  # is already directory
+  if [ -d "$path" ]; then
+    return
+  fi
+
+  # exists, but not directory
+  if [ -e "$path" ]; then
+    do_or_die rm -f "$path"
+  fi
+}

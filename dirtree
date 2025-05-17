@@ -7,6 +7,8 @@ ROOT/env       # environment variables
 ROOT/doc         # scripts for generating documentation
 ROOT/doc/doc     # script for generating all docs
 ROOT/doc/doc.awk # script for generating 1 doc
+ROOT/doc/hdr     # doc file headers
+ROOT/doc/hdr/arr # header for dynamic array doc
 
 ROOT/tmp       # templates
 ROOT/tmp/arr.h # dynamic array

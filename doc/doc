@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# grab environment
+source "$CTL_ROOT/env"
+
+# source our bash library
+source "$CTL_BASH_LIB"
+
+# templates
+tmps=(
+  'arr' # dynamic array
+)
+
+# setup arch directory if needed
+if ! [ -d "$CTL_ARCH" ]; then
+  if [ -e "$CTL_ARCH" ]; then
+    do_or_die rm -f "$CTL_ARCH"
+  fi
+  # create arch directory
+  do_or_die mkdir "$CTL_ARCH"
+  # move project structure files to arch
+  do_or_die mv "$CTL_ROOT/dirtree" "$CTL_ARCH/dirtree"
+  do_or_die mv "$CTL_ROOT/dirpic" "$CTL_ARCH/dirpic"
+fi
+
+# for each template
+for tmp in "${tmps[@]}"; do
+  tmpdir="$CTL_ARCH/$tmp" # template doc directory
+  tmpsrc="$CTL_TMP/$tmp"  # template source
+  func="${tmp^^}_DEF"     # template function name
+  priv="$tmpdir/priv"     # private member doc file
+  pub="$tmpdir/pub"       # public member doc file
+  hdr="hdr/$tmp"          # template doc header
+
+  if ! [ -d "$tmpdir" ]; then
+    if [ -e "$tmpdir" ]; then
+    fi
+  fi
+
+  # create doc directory for template
+  do_or_die mkdir "$tmpdir"
+
+  # write header to private and public member files
+  do_or_die cp "$hdr" "$priv"
+  do_or_die cp "$hdr" "$pub"
+
+  # generate doc
+  do_or_die ./doc.awk \
+    -v FUNC="$func"   \
+    -v PUB="$pub"     \
+    -v PRIV="$priv"   \
+    "$tmpsrc"
+done

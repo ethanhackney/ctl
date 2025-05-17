@@ -1,14 +1,86 @@
 #!/bin/bash
 
-for t in ./test/*.c; do
-  file="${t##*/}"
-  name="${file%.*}"
-  if ! ./mktest/$name; then
+# get test name from path
+#
+# args:
+#  @path: path
+#
+# ret:
+#  test name
+test_name() {
+  local path="$1"          # path/to/main.c
+  local file="${path##*/}" # main.c
+  local name="${file%.*}"  # main
+
+  # make sure we match *.c
+  local ext="${file##*.}"
+  if [ "$ext" != 'c' ]; then
+    echo "$path is not c source: bad extension" >&2
     exit 1
   fi
-  if ! gcc "$t" lib.c; then
+
+  # make sure contents are c
+  ft=$(file "$path")
+  if [ "$ft" != "$path: C source, ASCII text" ]; then
+    echo "$path is not c source: contents not c" >&2
     exit 1
   fi
-  ./a.out
-  rm ./a.out
+
+  # return name
+  echo "$name"
+}
+
+# source our environment
+source "$CTL_ROOT/env"
+
+# source our bash library
+source "$CTL_BASH_LIB"
+
+# no output run
+export silent=0
+
+# parse args
+while [ $# -ne 0 ]; do
+  case "$1" in
+    -s|--silent)
+      silent=1
+      ;;
+    -*)
+      echo "invalid option: $1" >&2
+      exit 1
+      ;;
+    *)
+      echo "not an option: $1" >&2
+      exit 2
+      ;;
+  esac
+done
+
+# for each test
+for t in $CTL_ROOT/test/*.c; do
+  # skip directories
+  if [ -d "$t" ]; then
+    continue
+  fi
+
+  # get our name
+  name=$(test_name $t)
+
+  # make tests for this name
+  do_or_die ./mktest/$name
+
+  # generate makefile
+cat >Makefile <<EOF
+main: $t $CTL_LIB
+$(printf '\t')gcc -Wall -Werror -pedantic -DDBUG -fsanitize=address,undefined \$^
+EOF
+
+  # compile test
+  do_or_die make
+
+  # run it
+  do_or_die ./a.out
+
+  # remove files
+  do_or_die rm a.out Makefile
 done

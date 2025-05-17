@@ -1,6 +1,9 @@
+#ifndef DBUG /* #ifndef DBUG */
 #define DBUG
-#include "../lib.h"
-#include "../arr.h"
+#endif /* #ifndef DBUG */
+
+#include "../lib/lib.h"
+#include "../tmp/arr.h"
 #include <time.h>
 #include <stdint.h>
 #include <string.h>
@@ -20,7 +23,7 @@
  *    > 0 if arg0 > arg1
  */
 #define ARR_TEST(_type, _name, _cmp)                                    \
-ARR_DEF(static, _type, _name)                                           \
+ARR_DEF(, _type, _name)                                                 \
 /**                                                                     \
  * do test on _name:                                                    \
  *                                                                      \
@@ -29,7 +32,7 @@ ARR_DEF(static, _type, _name)                                           \
  *  @n:    number of elements in data                                   \
  *  @nil:  nil value (for testing failed searches)                      \
  */                                                                     \
-static void                                                             \
+PUBLIC void                                                             \
 _name ## _do_test(_type *data, size_t n, _type nil)                     \
 {                                                                       \
         struct _name arr = {0};                                         \
@@ -39,7 +42,7 @@ _name ## _do_test(_type *data, size_t n, _type nil)                     \
         _type v;                                                        \
         int ret = 0;                                                    \
                                                                         \
-        if (_name ## _init(&arr, 0, 0) < 0)                             \
+        if (_name ## _init(&arr, 0) < 0)                                \
                 die("%s_init", TO_STR(_name));                          \
                                                                         \
         if (_name ## _addv(&arr, 0, data, n) < 0)                       \
@@ -92,7 +95,7 @@ _name ## _do_test(_type *data, size_t n, _type nil)                     \
 /**                                                                     \
  * test _name:                                                          \
  */                                                                     \
-static void                                                             \
+PUBLIC void                                                             \
 _name ## _test(void)                                                    \
 {                                                                       \
         _type data[1024];                                               \
@@ -114,18 +117,20 @@ again:                                                                  \
  * generate a comparison function:
  *
  * args:
+ *  @_name: function name prefix
  *  @_type: type of arguments
  */
 #define CMP_DEF(_name, _type)                   \
-static int                                      \
+PUBLIC int                                      \
 _name ## _cmp(const _type a, const _type b)     \
 {                                               \
         return NUM_CMP(a, b);                   \
 }
 
-#include "tab/arr.h"
+#include "do/arr.c"
 
 int
 main(int argc, char **argv)
 {
+        test();
 }

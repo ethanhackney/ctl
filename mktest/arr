@@ -1,28 +1,44 @@
 #!/bin/bash
 
-PREFIX=/home/ethanhackney/code/ctl
+# grab environment
+source "$CTL_ROOT/env"
 
-awk '
+awk -v SILENT=$silent '
 BEGIN {
+  print "/* AUTO-GENERATED!! DO NOT MODIFY */"
   FS = ","
 }
+
 length($0) > 0 {
-  names[NR] = $2
-  fn = $NF
+  cmpfn = $3 # name of comparison function (or empty for default)
+  type  = $1 # type of array
+  name  = $2 # name of array struct
+
+  # save our name for later
+  names[++nnames] = name
+
+  # no comparison function given?
   if (NF != 3) {
-    printf("CMP_DEF(%s, %s)\n", $2, $1)
-    fn = $2 "_cmp"
+    # generate one
+    printf("CTL_CMP_DEF(%s, %s)\n", name, type)
+    cmpfn = name "_cmp"
   }
-  printf("ARR_TEST(%s, %s, %s)\n", $1, $2, fn)
+
+  printf("CTL_ARR_TEST(%s, %s, %s)\n", type, name, cmpfn)
 }
+
 END {
   print ""
   print "void"
   print "test(void)"
   print "{"
-  for (i = 1; i <= NR; i++) {
-    printf("\t%s_test()\n", names[i])
+  printf("\tprintf(\"CTL_ARR_DEF tests running...\\n\");\n")
+  for (i = 1; i <= nnames; i++) {
+    printf("\t%s_test();\n", names[i])
+    if (!SILENT)
+      printf("\tprintf(\"PASSED: %s_test\");\n", names[i])
   }
+  printf("\tprintf(\"PASS\\n\");\n")
   print "}"
 }
-' $PREFIX/mktest/tab/arr >$PREFIX/test/tab/arr.c
+' "$CTL_ROOT/mktest/tab/arr" >"$CTL_ROOT/test/do/arr.c"

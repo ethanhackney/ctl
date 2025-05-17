@@ -1,0 +1,10 @@
+=========================
+ARR_DEF(link, type, name)
+=========================
+info:
+ dynamic array template
+
+args:
+ @link: linkage of generated functions
+ @type: type of array elements
+ @name: name of generated struct and prefix of all function names

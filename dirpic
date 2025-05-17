@@ -13,6 +13,10 @@
     +--->[ doc ]
     |       |
     |       +--->[ doc generator scripts ]
+    |       |
+    |       +--->[ hdr ]
+    |               |
+    |               +-->[ doc file headers ]
     |
     +--->[ tmp ]
     |       |

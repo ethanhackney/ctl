@@ -1,14 +1,2 @@
-CFLAGS = -Wall -Werror -pedantic
-FFLAGS = $(CFLAGS) -O3
-DFLAGS = $(CFLAGS) -DDBUG -fsanitize=address,undefined
-SRC    = main.c lib.c
-CC     = gcc
-
-safe:
-	$(CC) $(DFLAGS) $(SRC)
-
-fast:
-	$(CC) $(FFLAGS) $(SRC)
-
-test:
-	./run_tests
+main: /home/ethanhackney/code/ctl/test/arr.c /home/ethanhackney/code/ctl/lib/lib.c
+	gcc -Wall -Werror -pedantic -DDBUG -fsanitize=address,undefined $^
