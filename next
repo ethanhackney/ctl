@@ -1,0 +1,42 @@
+/**                                                             \
+ * remove multiple values to _name:                             \
+ *                                                              \
+ * args:                                                        \
+ *  @ap:  pointer to _name                                      \
+ *  @idx: where to add                                          \
+ *  @len: length of array                                       \
+ *                                                              \
+ * ret:                                                         \
+ *  @success: 0                                                 \
+ *  @failure: -1 and errno set                                  \
+ */                                                             \
+_link int                                                       \
+_name ## _rmv(struct _name *ap,                                 \
+               size_t idx,                                      \
+               _type *arr,                                      \
+               size_t len)                                      \
+{                                                               \
+        size_t shift = 0;                                       \
+        _type *src = NULL;                                      \
+        _type *dst = NULL;                                      \
+                                                                \
+        ARR_OK(ap);                                             \
+        dbug(idx >= ap->len, "idx >= len");                     \
+        dbug(len == 0, "len == 0");                             \
+        dbug(len > ap->len, "len > ap->len");                   \
+                                                                \
+        if (_name ## _shrink_by_if_needed(ap, len) < 0)         \
+                return -1;                                      \
+                                                                \
+        if (arr != NULL) {                                      \
+                src = ap->arr + idx;                            \
+                dst = arr;                                      \
+                shift = sizeof(_type) * len;                    \
+                memcpy(src, dst, shift);                        \
+        }                                                       \
+                                                                \
+        src = ap->arr + idx + len;
+        memm
+        ap -= len;
+        return 0;                                               \
+}
