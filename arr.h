@@ -1,32 +1,115 @@
 /**
- * ------------------------------------------------------------
+ * ============================================================
  * dynamic array<link,type,name>
  *  @link: linkage of generated functions
  *  @type: type of array elements
  *  @name: name of generated struct and prefix of all functions
- * ------------------------------------------------------------
+ * ============================================================
  *
- * public functions
- * ----------------
- * ${name}_init # initialize array
- * ${name}_free # free array
- * ${name}_grow # grow
- * ${name}_push # add value to end of array
- * ${name}_pop  # remove value from end of array
- * ${name}_add  # add value to array at index
- * ${name}_addv # vector version of ${name}_add
- * ${name}_rm   # remove value at index
- * ${name}_rmv  # vector version of ${name}_rm
+ * ====================
+ * public ${name}_init:
+ *  initialize array
+ * ====================
+ * args:
+ *  @ap:   pointer to ${name}
+ *  @cap:  initial capacity or 0 for ARR_INIT_CAP
+ *  @argc: argument count
+ *  @...:  arguments
  *
- * private functions
- * -----------------
- * ${name}_shrink_by_if_needed # shrink by amount if needed
- * ${name}_grow_by_if_needed   # grow by amount if needed
- * ${name}_shrink_if_needed    # shrink if needed
- * ${name}_grow_if_needed      # grow if needed
- * ${name}_shrink_by           # shrink by amount
- * ${name}_grow_by             # grow by amount
- * ${name}_shrink              # shrink
+ * ret:
+ *  @sucess:  0
+ *  @failure: -1 and errno set
+ *
+ * ====================
+ * public ${name}_free:
+ *  free array
+ * ====================
+ * args:
+ *  @ap:   pointer to ${name}
+ *  @dtor: optional element destructor
+ *
+ * ret:
+ *  none
+ *  
+ * ==========================
+ * public ${name}_push:
+ *  add value to end of array
+ * ==========================
+ * args:
+ *  @ap: pointer to ${name}
+ *  @v:  value to add
+ *
+ * ret:
+ *  @sucess:  0
+ *  @failure: -1 and errno set
+ *
+ * ================================
+ * public ${name}_pop:
+ *  remove value from end of array
+ * ================================
+ * args:
+ *  @ap: pointer to ${name}
+ *  @vp: pointer to type (or null if do not care about element)
+ *
+ * re:
+ *  @success: 0 and if vp provided, *vp set to last element
+ *  @failure: -1 and errno set
+ *
+ * ============================
+ * public ${name}_add:
+ *  add value to array at index
+ * ============================
+ * args:
+ *  @ap:  pointer to ${name}
+ *  @idx: where to add it
+ *  @v:   value to add
+ *
+ * ret:
+ *  @sucess:  0
+ *  @failure: -1 and errno set
+ *
+*  ==============================
+ * public ${name}_addv:
+ *  vector version of ${name}_add
+ * ==============================
+ * args:
+ *  @ap:  pointer to ${name}
+ *  @idx: where to add it
+ *  @v:   value to add
+ *  @arr: vector
+ *  @len: vector length
+ *
+ * ret:
+ *  @sucess:  0
+ *  @failure: -1 and errno set
+ *
+ * ======================
+ * public ${name}_rm:
+ *  remove value at index
+ * ======================
+ * args:
+ *  @ap:  pointer to ${name}
+ *  @idx: where to add it
+ *  @v:   value to add
+ *
+ * ret:
+ *  @sucess:  0
+ *  @failure: -1 and errno set
+ *
+ * =============================
+ * public ${name}_rmv:
+ *  vector version of ${name}_rm
+ * =============================
+ * args:
+ *  @ap:  pointer to ${name}
+ *  @idx: where to add it
+ *  @v:   value to add
+ *  @arr: vector
+ *  @len: vector length
+ *
+ * ret:
+ *  @sucess:  0
+ *  @failure: -1 and errno set
  */
 #ifndef ARR_H
 #define ARR_H
@@ -599,7 +682,7 @@ _name ## _rmv(struct _name *ap,                                 \
                                                                 \
         if (_name ## _shrink_by_if_needed(ap, len) < 0)         \
                 return -1;                                      \
-                                                                \
+
         if (arr != NULL) {                                      \
                 src = ap->arr + idx;                            \
                 dst = arr;                                      \
@@ -607,7 +690,9 @@ _name ## _rmv(struct _name *ap,                                 \
                 memcpy(dst, src, shift);                        \
         }                                                       \
                                                                 \
+        /* is there any thing left? */                          \
         if (idx + len < ap->len) {                              \
+                /* shift down */                                \
                 src = ap->arr + idx;                            \
                 dst = src + len;                                \
                 shift = (ap->len - idx - len) * sizeof(_type);  \
