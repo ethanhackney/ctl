@@ -1,7 +1,7 @@
 CFLAGS = -Wall -Werror -pedantic
 FFLAGS = $(CFLAGS) -O3
 DFLAGS = $(CFLAGS) -DDBUG -fsanitize=address,undefined
-SRC    = main.c
+SRC    = main.c lib.c
 CC     = gcc
 
 safe:
