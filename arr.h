@@ -682,7 +682,7 @@ _name ## _rmv(struct _name *ap,                                 \
                                                                 \
         if (_name ## _shrink_by_if_needed(ap, len) < 0)         \
                 return -1;                                      \
-
+                                                                \
         if (arr != NULL) {                                      \
                 src = ap->arr + idx;                            \
                 dst = arr;                                      \
