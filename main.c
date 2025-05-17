@@ -1,0 +1,520 @@
+#include <stdlib.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <errno.h>
+#include <string.h>
+#include <time.h>
+
+/**
+ * print message + errno message and exit:
+ *
+ * args:
+ *  @fmt: format string
+ *  @...: arguments
+ *
+ * ret:
+ *  exit process
+ */
+void
+die(const char *fmt, ...)
+{
+        va_list va;
+        int tmp = 0;
+
+        va_start(va, fmt);
+        tmp = errno;
+        vfprintf(stderr, fmt, va);
+        va_end(va);
+        fprintf(stderr, ": %s\n", strerror(tmp));
+        exit(EXIT_FAILURE);
+}
+
+/* if debugging */
+#ifdef DBUG
+/**
+ * test condition and if true, print message and exit:
+ *
+ * args:
+ *  @cond: condition to test
+ *  @file: name of file
+ *  @func: name of function
+ *  @line: line number
+ *  @fmt:  format string
+ *  @...:  arguments
+ *
+ * ret:
+ *  exit process
+ */
+void
+do_dbug(bool cond,
+        const char *file,
+        const char *func,
+        int line,
+        const char *fmt, ...)
+{
+        va_list va;
+
+        if (!cond)
+                return;
+
+        fprintf(stderr, "[%s:%s:%d]: ", file, func, line);
+        va_start(va, fmt);
+        vfprintf(stderr, fmt, va);
+        va_end(va);
+        fprintf(stderr, "\n");
+        exit(EXIT_FAILURE);
+}
+#else
+void
+do_dbug(bool cond,
+        const char *file,
+        const char *func,
+        int line,
+        const char *fmt, ...)
+{
+}
+#endif /* #ifdef DBUG */
+
+/**
+ * test condition and if true, print message and exit:
+ *
+ * args:
+ *  @_cond: condition to test
+ *  @_fmt:  format string
+ *  @...:   arguments
+ *
+ * ret:
+ *  exit process
+ */
+#define dbug(_cond, _fmt, ...) \
+        do_dbug(_cond, __FILE__, __func__, __LINE__, _fmt, ##__VA_ARGS__)
+
+/* default initial capacity */
+#ifndef ARR_INIT_CAP
+#define ARR_INIT_CAP 32
+#endif /* #ifndef ARR_INIT_CAP */
+
+/**
+ * test if state of array is valid:
+ *
+ * args:
+ *  @_ap: pointer to array
+ *
+ * ret:
+ *  may exit process
+ */
+#define ARR_OK(_ap) do {                                        \
+        dbug((_ap) == NULL, "ap == NULL");                      \
+        dbug((_ap)->arr == NULL, "ap->arr == NULL");            \
+        dbug((_ap)->cap == 0, "ap->cap == 0");                  \
+        dbug((_ap)->len > (_ap)->cap, "ap->len > ap->cap");     \
+} while (0)
+
+/**
+ * iterate through array:
+ *
+ * args:
+ *  @_ap: pointer to array
+ *  @_p:  element pointer
+ */
+#define ARR_FOR_EACH(_ap, _p) \
+        for (_p = (_ap)->arr; _p != (_ap)->arr + (_ap)->len; _p++)
+
+/**
+ * define a new dynamic array:
+ *
+ * args:
+ *  @_link: linkage of generated functions
+ *  @_type: type of array elements
+ *  @_name: name of generated struct
+ */
+#define ARR_DEF(_link, _type, _name)                            \
+                                                                \
+struct _name {                                                  \
+        size_t  cap; /* physical length of array */             \
+        size_t  len; /* logical length of array */              \
+        _type  *arr; /* heap array of _type */                  \
+};                                                              \
+                                                                \
+/**                                                             \
+ * initialize _name:                                            \
+ *                                                              \
+ * args:                                                        \
+ *  @ap:   pointer to _name                                     \
+ *  @cap:  initial capacity or zero for default                 \
+ *  @argc: argument count                                       \
+ *  @...:  arguments                                            \
+ *                                                              \
+ * ret:                                                         \
+ *  @success: 0                                                 \
+ *  @failure: -1 and errno set                                  \
+ */                                                             \
+_link int                                                       \
+_name ## _init(struct _name *ap, size_t cap, size_t argc, ...)  \
+{                                                               \
+        va_list va;                                             \
+        size_t i = 0;                                           \
+                                                                \
+        dbug(ap == NULL, "ap == NULL");                         \
+                                                                \
+        if (cap == 0)                                           \
+                cap = ARR_INIT_CAP;                             \
+        if (cap < argc)                                         \
+                cap = argc;                                     \
+                                                                \
+        ap->arr = calloc(cap, sizeof(_type));                   \
+        if (ap->arr == NULL)                                    \
+                return -1;                                      \
+                                                                \
+        va_start(va, argc);                                     \
+        for (i = 0; i < argc; i++)                              \
+                ap->arr[i] = va_arg(va, _type);                 \
+        va_end(va);                                             \
+                                                                \
+        ap->cap = cap;                                          \
+        ap->len = argc;                                         \
+        return 0;                                               \
+}                                                               \
+                                                                \
+/**                                                             \
+ * free _name:                                                  \
+ *                                                              \
+ * args:                                                        \
+ *  @ap:   pointer to _name                                     \
+ *  @dtor: optional destructor                                  \
+ */                                                             \
+_link void                                                      \
+_name ## _free(struct _name *ap, void (*dtor)(_type))           \
+{                                                               \
+        size_t i = 0;                                           \
+                                                                \
+        ARR_OK(ap);                                             \
+                                                                \
+        if (dtor == NULL)                                       \
+                goto finish;                                    \
+                                                                \
+        for (i = 0; i < ap->len; i++)                           \
+                dtor(ap->arr[i]);                               \
+                                                                \
+finish:                                                         \
+        free(ap->arr);                                          \
+        memset(ap, 0, sizeof(*ap));                             \
+}                                                               \
+                                                                \
+/**                                                             \
+ * grow _name:                                                  \
+ *                                                              \
+ * args:                                                        \
+ *  @ap: pointer to _name                                       \
+ *                                                              \
+ * ret:                                                         \
+ *  @success: 0                                                 \
+ *  @failure: -1 and errno set                                  \
+ */                                                             \
+_link int                                                       \
+_name ## _grow(struct _name *ap)                                \
+{                                                               \
+        size_t cap = 0;                                         \
+        size_t diff = 0;                                        \
+        _type *p = NULL;                                        \
+                                                                \
+        ARR_OK(ap);                                             \
+                                                                \
+        /* double the cap */                                    \
+        cap = ap->cap * 2;                                      \
+        p = ap->arr;                                            \
+        p = realloc(p, sizeof(_type) * cap);                    \
+        if (p == NULL)                                          \
+                return -1;                                      \
+                                                                \
+        /* zero out newly allocated data */                     \
+        diff = cap - ap->cap;                                   \
+        memset(p + ap->cap, 0, sizeof(_type) * diff);           \
+                                                                \
+        ap->arr = p;                                            \
+        ap->cap = cap;                                          \
+        return 0;                                               \
+}                                                               \
+                                                                \
+/**                                                             \
+ * grow _name if needed:                                        \
+ *                                                              \
+ * args:                                                        \
+ *  @ap: pointer to _name                                       \
+ *                                                              \
+ * ret:                                                         \
+ *  @success: 0                                                 \
+ *  @failure: -1 and errno set                                  \
+ */                                                             \
+_link int                                                       \
+_name ## _grow_if_needed(struct _name *ap)                      \
+{                                                               \
+        /* not ready to grow? */                                \
+        if (ap->len < ap->cap)                                  \
+                return 0;                                       \
+                                                                \
+        return _name ## _grow(ap);                              \
+}                                                               \
+                                                                \
+/**                                                             \
+ * add value to end of _name:                                   \
+ *                                                              \
+ * args:                                                        \
+ *  @ap: pointer to _name                                       \
+ *  @v:  value to add                                           \
+ *                                                              \
+ * ret:                                                         \
+ *  @success: 0                                                 \
+ *  @failure: -1 and errno set                                  \
+ */                                                             \
+_link int                                                       \
+_name ## _push(struct _name *ap, _type v)                       \
+{                                                               \
+        ARR_OK(ap);                                             \
+                                                                \
+        if (_name ## _grow_if_needed(ap) < 0)                   \
+                return -1;                                      \
+                                                                \
+        ap->arr[ap->len] = v;                                   \
+        ap->len++;                                              \
+        return 0;                                               \
+}                                                               \
+                                                                \
+/**                                                             \
+ * shrink _name:                                                \
+ *                                                              \
+ * args:                                                        \
+ *  @ap: pointer to _name                                       \
+ *                                                              \
+ * ret:                                                         \
+ *  @success: 0                                                 \
+ *  @failure: -1 and errno set                                  \
+ */                                                             \
+_link int                                                       \
+_name ## _shrink(struct _name *ap)                              \
+{                                                               \
+        size_t cap = 0;                                         \
+        _type *p = NULL;                                        \
+                                                                \
+        ARR_OK(ap);                                             \
+                                                                \
+        /* half the cap */                                      \
+        cap = ap->cap / 2;                                      \
+        p = ap->arr;                                            \
+        p = realloc(p, sizeof(_type) * cap);                    \
+        if (p == NULL)                                          \
+                return -1;                                      \
+                                                                \
+        ap->arr = p;                                            \
+        ap->cap = cap;                                          \
+        return 0;                                               \
+}                                                               \
+                                                                \
+/**                                                             \
+ * shrink _name if needed:                                      \
+ *                                                              \
+ * args:                                                        \
+ *  @ap: pointer to _name                                       \
+ *                                                              \
+ * ret:                                                         \
+ *  @success: 0                                                 \
+ *  @failure: -1 and errno set                                  \
+ */                                                             \
+_link int                                                       \
+_name ## _shrink_if_needed(struct _name *ap)                    \
+{                                                               \
+        /* not ready to shrink? */                              \
+        if (ap->len > (ap->cap / 2))                            \
+                return 0;                                       \
+                                                                \
+        /* shrinking too much? */                               \
+        if ((ap->cap / 2) < ARR_INIT_CAP)                       \
+                return 0;                                       \
+                                                                \
+        return _name ## _shrink(ap);                            \
+}                                                               \
+                                                                \
+/**                                                             \
+ * remove element from end of _name:                            \
+ *                                                              \
+ * args:                                                        \
+ *  @ap: pointer to _name                                       \
+ *  @vp: pointer to _type (pass NULL if you do not want it)     \
+ *                                                              \
+ * ret:                                                         \
+ *  @success: 0                                                 \
+ *  @failure: -1 and errno set                                  \
+ */                                                             \
+_link int                                                       \
+_name ## _pop(struct _name *ap, _type *vp)                      \
+{                                                               \
+        ARR_OK(ap);                                             \
+                                                                \
+        /* empty? */                                            \
+        if (ap->len == 0)                                       \
+                return 1;                                       \
+                                                                \
+        if (_name ## _shrink_if_needed(ap) < 0)                 \
+                return -1;                                      \
+                                                                \
+        ap->len--;                                              \
+        if (vp != NULL)                                         \
+                *vp = ap->arr[ap->len];                         \
+                                                                \
+        return 0;                                               \
+}                                                               \
+                                                                \
+/**                                                             \
+ * sort _name:                                                  \
+ *                                                              \
+ * args:                                                        \
+ *  @ap: pointer to _name                                       \
+ *  @fn: comparison function                                    \
+ */                                                             \
+_link void                                                      \
+_name ## _sort(struct _name *ap,                                \
+               int (*fn)(const void *, const void *))           \
+{                                                               \
+        ARR_OK(ap);                                             \
+        dbug(fn == NULL, "fn == NULL");                         \
+        qsort(ap->arr, ap->len, sizeof(_type), fn);             \
+}                                                               \
+                                                                \
+/**                                                             \
+ * add value to _name:                                          \
+ *                                                              \
+ * args:                                                        \
+ *  @ap:  pointer to _name                                      \
+ *  @idx: where to put v                                        \
+ *  @v:   value to add                                          \
+ *                                                              \
+ * ret:                                                         \
+ *  @success: 0                                                 \
+ *  @failure: -1 and errno set                                  \
+ */                                                             \
+_link int                                                       \
+_name ## _add(struct _name *ap, size_t idx, _type v)            \
+{                                                               \
+        size_t shift = 0;                                       \
+        _type *src = NULL;                                      \
+        _type *dst = NULL;                                      \
+                                                                \
+        ARR_OK(ap);                                             \
+        dbug(idx >= ap->cap, "idx >= ap->cap");                 \
+                                                                \
+        if (_name ## _grow_if_needed(ap) < 0)                   \
+                return -1;                                      \
+                                                                \
+        src = ap->arr + idx;                                    \
+        dst = src + 1;                                          \
+        shift = sizeof(_type) * (ap->len - idx);                \
+        memmove(dst, src, shift);                               \
+                                                                \
+        ap->arr[idx] = v;                                       \
+        ap->len++;                                              \
+        return 0;                                               \
+}                                                               \
+                                                                \
+/**                                                             \
+ * remove value from _name:                                     \
+ *                                                              \
+ * args:                                                        \
+ *  @ap:  pointer to _name                                      \
+ *  @idx: value to remove                                       \
+ *  @vp:  pointer to _type (pass NULL if you do not want it)    \
+ *                                                              \
+ * ret:                                                         \
+ *  @success: 0                                                 \
+ *  @failure: -1 and errno set                                  \
+ */                                                             \
+_link int                                                       \
+_name ## _rm(struct _name *ap, size_t idx, _type *vp)           \
+{                                                               \
+        size_t shift = 0;                                       \
+        _type *src = NULL;                                      \
+        _type *dst = NULL;                                      \
+                                                                \
+        ARR_OK(ap);                                             \
+        dbug(idx >= ap->len, "idx >= ap->len");                 \
+                                                                \
+        if (ap->len == 0)                                       \
+                return 1;                                       \
+                                                                \
+        if (_name ## _shrink_if_needed(ap) < 0)                 \
+                return -1;                                      \
+                                                                \
+        if (vp != NULL)                                         \
+                *vp = ap->arr[idx];                             \
+                                                                \
+        dst = ap->arr + idx;                                    \
+        src = dst + 1;                                          \
+        shift = sizeof(_type) * (ap->len - idx - 1);            \
+        memmove(src, dst, shift);                               \
+                                                                \
+        ap->len--;                                              \
+        return 0;                                               \
+}
+
+/**
+ * compare arguments:
+ *
+ * args:
+ *  @app: pointer to first string
+ *  @bpp: pointer to second string
+ *
+ * ret:
+ *  < 0 if *app < *bpp
+ *  = 0 if *app = *bpp
+ *  > 0 if *app > *bpp
+ */
+static int
+arg_cmp(const void *app, const void *bpp)
+{
+        const char *a = *(const char **)app;
+        const char *b = *(const char **)bpp;
+
+        return strcmp(a, b);
+}
+
+/* dynamic array of strings */
+ARR_DEF(, char *, strvec)
+
+int
+main(int argc, char **argv)
+{
+        struct strvec args = {0};
+        size_t idx = 0;
+        char **p = NULL;
+        char *v = NULL;
+        int ret = 0;
+
+        (void)arg_cmp;
+
+        srand(time(NULL));
+
+        if (strvec_init(&args, 0, 1, "ethan") < 0)
+                die("main: strvec_init");
+
+        for (p = argv; *p != NULL; p++) {
+                idx = rand() % args.len;
+                if (strvec_add(&args, idx, *p) < 0)
+                        die("main: strvec_add");
+        }
+
+        for (;;) {
+                idx = rand() % args.len;
+                ret = strvec_rm(&args, idx, &v);
+
+                if (ret < 0)
+                        die("main: strvec_rm");
+                if (ret > 0)
+                        break;
+
+                puts(v);
+                if (args.len == 0)
+                        break;
+        }
+
+        strvec_free(&args, NULL);
+}
