@@ -1,3 +1,14 @@
-char *,strvec,strcmp
-int,intvec
-float,floatvec
+uint64_t,u64arr
+uint32_t,u32arr
+uint16_t,u16arr
+uint8_t,u8arr
+
+int64_t,s64arr
+int32_t,s32arr
+int16_t,s16arr
+int8_t,s8arr
+
+double,doublearr
+float,floatarr
+
+char *,strarr,strcmp

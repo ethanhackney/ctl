@@ -6,7 +6,7 @@ awk '
 BEGIN {
   FS = ","
 }
-{
+length($0) > 0 {
   names[NR] = $2
   fn = $NF
   if (NF != 3) {
