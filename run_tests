@@ -1,0 +1,14 @@
+#!/bin/bash
+
+for t in ./test/*.c; do
+  file="${t##*/}"
+  name="${file%.*}"
+  if ! ./mktest/$name; then
+    exit 1
+  fi
+  if ! gcc "$t" lib.c; then
+    exit 1
+  fi
+  ./a.out
+  rm ./a.out
+done

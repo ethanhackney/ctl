@@ -9,3 +9,6 @@ safe:
 
 fast:
 	$(CC) $(FFLAGS) $(SRC)
+
+test:
+	./run_tests

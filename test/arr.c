@@ -1,0 +1,131 @@
+#define DBUG
+#include "../lib.h"
+#include "../arr.h"
+#include <time.h>
+#include <stdint.h>
+#include <string.h>
+#include <stdio.h>
+
+/**
+ * define a new array test:
+ *
+ * args:
+ *  @_type:  type of elements
+ *  @_name:  struct name
+ *  @_never: value that cannot exist in array
+ *  @_cmp:   comparison function
+ *   ret:
+ *    < 0 if arg0 < arg1
+ *    = 0 if arg0 = arg1
+ *    > 0 if arg0 > arg1
+ */
+#define ARR_TEST(_type, _name, _cmp)                                    \
+ARR_DEF(static, _type, _name)                                           \
+/**                                                                     \
+ * do test on _name:                                                    \
+ *                                                                      \
+ * args:                                                                \
+ *  @data: test data                                                    \
+ *  @n:    number of elements in data                                   \
+ *  @nil:  nil value (for testing failed searches)                      \
+ */                                                                     \
+static void                                                             \
+_name ## _do_test(_type *data, size_t n, _type nil)                     \
+{                                                                       \
+        struct _name arr = {0};                                         \
+        size_t idx = 0;                                                 \
+        size_t i = 0;                                                   \
+        _type *p = NULL;                                                \
+        _type v;                                                        \
+        int ret = 0;                                                    \
+                                                                        \
+        if (_name ## _init(&arr, 0, 0) < 0)                             \
+                die("%s_init", TO_STR(_name));                          \
+                                                                        \
+        if (_name ## _addv(&arr, 0, data, n) < 0)                       \
+                die("%s_addv", TO_STR(_name));                          \
+                                                                        \
+        ARR_FOR_EACH(&arr, p) {                                         \
+                i = _name ## _find(&arr, *p, _cmp);                     \
+                if (i == arr.len)                                       \
+                        die("%s_find", TO_STR(_name));                  \
+        }                                                               \
+        if (_name ## _find(&arr, nil, _cmp) != arr.len)                 \
+                die("%s_find", TO_STR(_name));                          \
+                                                                        \
+        if (_name ## _rmv(&arr, 0, NULL, arr.len) < 0)                  \
+                die("%s_rmv", TO_STR(_name));                           \
+                                                                        \
+        for (p = data; p < data + n; p++) {                             \
+                if (_name ## _bin_add(&arr, *p, _cmp) < 0)              \
+                        die("%s_bin_add", TO_STR(_name));               \
+        }                                                               \
+                                                                        \
+        for (i = 0; i < arr.len - 1; i++) {                             \
+                if (_cmp(arr.arr[i], arr.arr[i + 1]) > 0)               \
+                        die("arr not sorted");                          \
+        }                                                               \
+                                                                        \
+        ARR_FOR_EACH(&arr, p) {                                         \
+                idx = _name ## _bin_find(&arr, *p, _cmp);               \
+                if (idx == arr.len)                                     \
+                        die("%s_bin_find", TO_STR(_name));              \
+        }                                                               \
+        if (_name ## _bin_find(&arr, nil, _cmp) != arr.len)             \
+                die("%s_bin_find", TO_STR(_name));                      \
+                                                                        \
+        for (;;) {                                                      \
+                idx = rand() % arr.len;                                 \
+                ret = _name ## _rm(&arr, idx, &v);                      \
+                                                                        \
+                if (ret < 0)                                            \
+                        die("%s_rm", TO_STR(_name));                    \
+                else if (ret > 0)                                       \
+                        break;                                          \
+                else if (arr.len == 0)                                  \
+                        break;                                          \
+        }                                                               \
+                                                                        \
+        _name ## _free(&arr, NULL);                                     \
+}                                                                       \
+                                                                        \
+/**                                                                     \
+ * test _name:                                                          \
+ */                                                                     \
+static void                                                             \
+_name ## _test(void)                                                    \
+{                                                                       \
+        _type data[1024];                                               \
+        _type nil;                                                      \
+        int n = sizeof(data) / sizeof(*data);                           \
+        int i = 0;                                                      \
+                                                                        \
+        buf_rand(&nil, sizeof(nil));                                    \
+again:                                                                  \
+        buf_rand(data, sizeof(data));                                   \
+        for (i = 0; i < n; i++) {                                       \
+                if (_cmp(data[i], nil) == 0)                            \
+                        goto again;                                     \
+        }                                                               \
+        _name ## _do_test(data, n, nil);                                \
+}
+
+/**
+ * generate a comparison function:
+ *
+ * args:
+ *  @_type: type of arguments
+ */
+#define CMP_DEF(_name, _type)                   \
+static int                                      \
+_name ## _cmp(const _type a, const _type b)     \
+{                                               \
+        return NUM_CMP(a, b);                   \
+}
+
+#include "tab/arr.h"
+
+int
+main(int argc, char **argv)
+{
+}

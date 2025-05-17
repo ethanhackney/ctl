@@ -36,36 +36,36 @@ main(int argc, char **argv)
         srand(time(NULL));
 
         if (strvec_init(&args, 0, 1, "ethan") < 0)
-                die("main: strvec_init");
+                die("strvec_init");
 
         if (strvec_addv(&args, 0, argv, argc) < 0)
-                die("main: strvec_addv");
+                die("strvec_addv");
 
         for (i = 0; i < args.len; i++) {
                 if (strvec_find(&args, args.arr[i], strcmp) == args.len)
-                        die("main: strvec_find");
+                        die("strvec_find");
         }
         if (strvec_find(&args, "1", strcmp) != args.len)
-                die("main: strvec_find");
+                die("strvec_find");
 
         strvec_clear(&args);
 
         for (p = argv; *p != NULL; p++) {
                 if (strvec_bin_add(&args, *p, strcmp) < 0)
-                        die("main: strvec_bin_add");
+                        die("strvec_bin_add");
         }
 
         for (i = 0; i < args.len - 1; i++) {
                 if (strcmp(args.arr[i], args.arr[i + 1]) > 0)
-                        die("main: args not sorted");
+                        die("args not sorted");
         }
 
         for (i = 0; i < args.len; i++) {
                 if (strvec_bin_find(&args, args.arr[i], strcmp) == args.len)
-                        die("main: strvec_bin_find");
+                        die("strvec_bin_find");
         }
         if (strvec_bin_find(&args, "1", strcmp) != args.len)
-                die("main: strvec_bin_find");
+                die("strvec_bin_find");
 
         for (;;) {
                 if (args.len == 0)
@@ -75,7 +75,7 @@ main(int argc, char **argv)
                 ret = strvec_rm(&args, idx, &v);
 
                 if (ret < 0)
-                        die("main: strvec_rm");
+                        die("strvec_rm");
                 if (ret > 0)
                         break;
         }

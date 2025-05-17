@@ -1,0 +1,3 @@
+char *,strvec,strcmp
+int,intvec
+float,floatvec

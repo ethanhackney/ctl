@@ -1,0 +1,28 @@
+#!/bin/bash
+
+PREFIX=/home/ethanhackney/code/ctl
+
+awk '
+BEGIN {
+  FS = ","
+}
+{
+  names[NR] = $2
+  fn = $NF
+  if (NF != 3) {
+    printf("CMP_DEF(%s, %s)\n", $2, $1)
+    fn = $2 "_cmp"
+  }
+  printf("ARR_TEST(%s, %s, %s)\n", $1, $2, fn)
+}
+END {
+  print ""
+  print "void"
+  print "test(void)"
+  print "{"
+  for (i = 1; i <= NR; i++) {
+    printf("\t%s_test()\n", names[i])
+  }
+  print "}"
+}
+' $PREFIX/mktest/tab/arr >$PREFIX/test/tab/arr.c

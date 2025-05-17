@@ -7,6 +7,17 @@
 #include <stdio.h>
 
 /**
+ * convert to string:
+ *
+ * args:
+ *  @v: value to convert
+ *
+ * ret:
+ *  string of v
+ */
+#define TO_STR(v) #v
+
+/**
  * compare two numbers:
  *
  * args:
@@ -21,18 +32,42 @@
 #define NUM_CMP(_a, _b) \
         ((_a) <= (_b) ? ((_a) < (_b) ? -1 : 0) : 1)
 
+/**
+ * randomize contents of buffer:
+ *
+ * args:
+ *  @buf:  buffer
+ *  @sz:   size of buffer
+ */
+void buf_rand(void *buf, size_t sz);
 
 /**
  * print message + errno message and exit:
  *
  * args:
- *  @fmt: format string
- *  @...: arguments
+ *  @file: file
+ *  @func: function
+ *  @line: line
+ *  @fmt:  format string
+ *  @...:  arguments
  *
  * ret:
  *  exit process
  */
-void die(const char *fmt, ...);
+void do_die(const char *file, const char *func, int line, const char *fmt, ...);
+
+/**
+ * print message + errno message and exit:
+ *
+ * args:
+ *  @_fmt: format string
+ *  @...:  arguments
+ *
+ * ret:
+ *  exit process
+ */
+#define die(_fmt, ...) \
+        do_die(__FILE__, __func__, __LINE__, _fmt, ##__VA_ARGS__)
 
 /* if debugging */
 #ifdef DBUG
