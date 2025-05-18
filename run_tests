@@ -24,24 +24,6 @@ source "$CTL_BASH_LIB"
 # ret:
 #  test name
 test_name() {
-  local path="$1"          # path/to/main.c
-  local file="${path##*/}" # main.c
-  local name="${file%.*}"  # main
-
-  # make sure we match *.c
-  local ext="${file##*.}"
-  if [ "$ext" != 'c' ]; then
-    echo "$path is not c source: bad extension" >&2
-    exit 1
-  fi
-
-  # make sure contents are c
-  ft=$(file "$path")
-  if [ "$ft" != "$path: C source, ASCII text" ]; then
-    echo "$path is not c source: contents not c" >&2
-    exit 1
-  fi
-
   # return name
   echo "$name"
 }
@@ -79,27 +61,37 @@ docdir=$(dirname $0)
 verbose "switching to $docdir"
 cd "$docdir"
 
+trap "rm -f a.out Makefile" EXIT
+
 verbose 'generating tests...'
 # for each test
 for t in $CTL_TEST/*.c; do
-  # skip directories
-  if [ -d "$t" ]; then
-    continue
+  file="${t##*/}"
+  name="${file%.*}"
+
+  # make sure we match *.c
+  ext="${file##*.}"
+  if [ "$ext" != 'c' ]; then
+    echo "$path is not c source: bad extension" >&2
+    exit 1
   fi
 
-  # get our name
-  name=$(test_name $t)
-  verbose "test name is $test_name"
+  # make sure contents are c
+  ft=$(file "$t")
+  if [ "$ft" != "$t: C source, ASCII text" ]; then
+    echo "$t is not c source: contents not c" >&2
+    exit 1
+  fi
 
   # generate test
-  verbose "generating test for $test_name"
+  verbose "generating test for $name"
   do_or_die "$CTL_MKTEST/$name"
 
   # generate makefile
   verbose 'generating Makefile'
 cat >Makefile <<EOF
-main: $t $CTL_LIB
-$(printf '\t')gcc -Wall -Werror -pedantic -DDBUG -fsanitize=address,undefined \$^
+main: $t $CTL_LIB/lib.c
+$(printf '\t')gcc $CTL_TEST_CFLAGS \$^
 EOF
 
   # compile test

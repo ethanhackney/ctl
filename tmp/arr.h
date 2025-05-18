@@ -236,7 +236,7 @@ _name ## _shrink_if_needed(struct _name *ap)                    \
                 return 0;                                       \
                                                                 \
         /* shrinking too much? */                               \
-        if ((ap->cap / 2) < ARR_INIT_CAP)                       \
+        if ((ap->cap / 2) < CTL_ARR_INIT_CAP)                   \
                 return 0;                                       \
                                                                 \
         return _name ## _shrink(ap);                            \
@@ -269,8 +269,11 @@ _name ## _pop(struct _name *ap,                                 \
                 return -1;                                      \
                                                                 \
         ap->len--;                                              \
-        if (vp != NULL)                                         \
+        if (vp != NULL) {                                       \
                 *vp = ap->arr[ap->len];                         \
+        } else if (dtor != NULL) {                              \
+                dtor(ap->arr[ap->len]);                         \
+        }                                                       \
                                                                 \
         return 0;                                               \
 }                                                               \
@@ -535,7 +538,7 @@ _name ## _shrink_by_if_needed(struct _name *ap, size_t amt)     \
         if (newlen > (ap->cap / 2))                             \
                 return 0;                                       \
                                                                 \
-        if (newlen < ARR_INIT_CAP)                              \
+        if (newlen < CTL_ARR_INIT_CAP)                          \
                 return 0;                                       \
                                                                 \
         return _name ## _shrink_by(ap, amt);                    \
@@ -751,8 +754,9 @@ _name ## _bin_find(const struct _name *ap,                      \
  * binary removal on _name:                                     \
  *                                                              \
  * args:                                                        \
- *  @ap: pointer to _name                                       \
- *  @v:  value to remove                                        \
+ *  @ap:   pointer to _name                                     \
+ *  @v:    value to remove                                      \
+ *  @dtor: optional destructor                                  \
  *  @cmp:                                                       \
  *   ret:                                                       \
  *    < 0 if a < b                                              \
@@ -766,6 +770,7 @@ _name ## _bin_find(const struct _name *ap,                      \
 PUBLIC _link int                                                \
 _name ## _bin_rm(struct _name *ap,                              \
                   _type v,                                      \
+                  void (*dtor)(_type),                          \
                   int (*cmp)(const _type, const _type))         \
 {                                                               \
         size_t i = 0;                                           \
@@ -777,7 +782,7 @@ _name ## _bin_rm(struct _name *ap,                              \
         if (i == ap->len)                                       \
                 return 0;                                       \
                                                                 \
-        return _name ## _rm(ap, i, NULL);                       \
+        return _name ## _rm(ap, i, NULL, dtor);                 \
 }
 
 #endif /* #ifndef CTL_ARR_H */

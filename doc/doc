@@ -16,12 +16,6 @@ source "$CTL_ENV"
 # source our bash library
 source "$CTL_BASH_LIB"
 
-# current directory
-olddir="$PWD"
-
-# switch back
-trap "cd $olddir" EXIT
-
 # verbose mode?
 v=0
 
@@ -110,7 +104,7 @@ for ((i = 0; i < ${#tmps[@]}; i++)); do
 
   # fail if no header
   if ! [ -e "$hdr" ]; then
-    die "$(basename $0): \"$tmp\" does not have a header yet" "$CTL_EEXIST"
+    die "\"$tmp\" does not have a header yet" "$CTL_EEXIST"
   fi
 
   # if doc directory for template not already there

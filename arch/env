@@ -7,7 +7,7 @@ CTL_BASH_LIB:      bash library
 CTL_OPT_BAD:       exit code for bad option
 CTL_PIC:           project directory tree picture
 CTL_TEST_CFLAGS:   compiler flags for tests
-CTL_LIB:           libraries
+CTL_LIB:           c library
 CTL_ARCH:          project docs
 CTL_TEST:          test directory
 CTL_TMP:           templates

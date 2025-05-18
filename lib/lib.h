@@ -68,7 +68,7 @@
  *  = 0 if _a = _b
  *  > 0 if _a > _b
  */
-#define NUM_CMP(_name, _cmp, _type)     \
+#define NUM_CMP(_name, _numcmp, _type)  \
 /**                                     \
  * compare two numbers:                 \
  *                                      \
@@ -84,7 +84,7 @@
 static inline int                       \
 _name ## _cmp(_type a, _type b)         \
 {                                       \
-        return _cmp ## _CMP(a, b);      \
+        return _numcmp ## _CMP(a, b);   \
 }
 
 NUM_CMP(u64, INT, uint64_t)

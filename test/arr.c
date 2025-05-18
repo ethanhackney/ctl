@@ -19,7 +19,7 @@
  *    > 0 if arg0 > arg1
  */
 #define ARR_TEST(_type, _name, _cmp)                                    \
-ARR_DEF(, _type, _name)                                                 \
+CTL_ARR_DEF(, _type, _name)                                             \
 /**                                                                     \
  * do test on _name:                                                    \
  *                                                                      \
@@ -48,7 +48,7 @@ _name ## _do_test(_type *data,                                          \
         if (_name ## _addv(&arr, 0, data, n) < 0)                       \
                 die("%s_addv", TO_STR(_name));                          \
                                                                         \
-        ARR_FOR_EACH(&arr, p) {                                         \
+        CTL_ARR_FOR_EACH(&arr, p) {                                     \
                 i = _name ## _find(&arr, *p, _cmp);                     \
                 if (i == arr.len)                                       \
                         die("%s_find", TO_STR(_name));                  \
@@ -69,7 +69,7 @@ _name ## _do_test(_type *data,                                          \
                         die("arr not sorted");                          \
         }                                                               \
                                                                         \
-        ARR_FOR_EACH(&arr, p) {                                         \
+        CTL_ARR_FOR_EACH(&arr, p) {                                     \
                 idx = _name ## _bin_find(&arr, *p, _cmp);               \
                 if (idx == arr.len)                                     \
                         die("%s_bin_find", TO_STR(_name));              \
@@ -89,7 +89,7 @@ _name ## _do_test(_type *data,                                          \
                         break;                                          \
         }                                                               \
                                                                         \
-        _name ## _free(&arr, dtor);                                     \
+        _name ## _free(&arr, NULL);                                     \
 }                                                                       \
                                                                         \
 /**                                                                     \
@@ -107,7 +107,6 @@ _name ## _test(void (*dtor)(_type))                                     \
 again:                                                                  \
         buf_rand(data, sizeof(data));                                   \
         for (i = 0; i < n; i++) {                                       \
-                printf("here\n");                                       \
                 if (_cmp(data[i], nil) == 0)                            \
                         goto again;                                     \
         }                                                               \

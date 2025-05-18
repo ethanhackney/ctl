@@ -34,7 +34,7 @@ die() {
   local msg="$1"
   local code="$2"
 
-  stderr "$msg"
+  stderr "$(basename $0): $msg"
   exit "$code"
 }
 
@@ -48,16 +48,15 @@ die() {
 #  exit process
 arg_bad() {
   local arg="$1"
-  local path="$2"
 
   case "$arg" in
     -*)
-      die "$(basename $path): invalid option: $arg" "$CTL_OPT_BAD"
+      die "$(basename $0): invalid option: $arg" "$CTL_OPT_BAD"
       ;;
     *)
-      die "$(basename $path): unexpected positional paramter: $arg" "$CTL_OPT_POS"
+      die "$(basename $0): unexpected positional paramter: $arg" "$CTL_OPT_POS"
       ;;
   esac
 
-  die "arg_bad: argument is not invalid"
+  die "$(basename $0): arg_bad: argument is not invalid"
 }
