@@ -27,16 +27,20 @@ length($0) > 0 {
   cmpfn = $3 # name of comparison function (or empty for default)
   type  = $1 # type of array
   name  = $2 # name of array struct
+  dtor  = $4 # destructor
 
   # save our name for later
-  names[++nnames] = name
+  names[++nnames,"name"] = name
 
   # no comparison function given?
-  if (NF != 3) {
+  if (NF < 3) {
     # generate one
     printf("CTL_CMP_DEF(%s, %s)\n", name, type)
     cmpfn = name "_cmp"
   }
+
+  # destructor?
+  names[nnames,"dtor"] = NF == 4 ? dtor : "NULL"
 
   printf("CTL_ARR_TEST(%s, %s, %s)\n", type, name, cmpfn)
 }
@@ -48,7 +52,7 @@ END {
   print "{"
   printf("\tprintf(\"CTL_ARR_DEF tests running...\\n\");\n")
   for (i = 1; i <= nnames; i++) {
-    printf("\t%s_test();\n", names[i])
+    printf("\t%s_test(%s);\n", names[i,"name"], names[i,"dtor"])
     if (!SILENT)
       printf("\tprintf(\"PASSED: %s_test\");\n", names[i])
   }

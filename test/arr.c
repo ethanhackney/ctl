@@ -31,9 +31,13 @@ ARR_DEF(, _type, _name)                                                 \
  *  @data: test data                                                    \
  *  @n:    number of elements in data                                   \
  *  @nil:  nil value (for testing failed searches)                      \
+ *  @dtor: optional destructor                                          \
  */                                                                     \
 PUBLIC void                                                             \
-_name ## _do_test(_type *data, size_t n, _type nil)                     \
+_name ## _do_test(_type *data,                                          \
+                  size_t n,                                             \
+                  _type nil,                                            \
+                  void (*dtor)(_type))                                  \
 {                                                                       \
         struct _name arr = {0};                                         \
         size_t idx = 0;                                                 \
@@ -56,7 +60,7 @@ _name ## _do_test(_type *data, size_t n, _type nil)                     \
         if (_name ## _find(&arr, nil, _cmp) != arr.len)                 \
                 die("%s_find", TO_STR(_name));                          \
                                                                         \
-        if (_name ## _rmv(&arr, 0, NULL, arr.len) < 0)                  \
+        if (_name ## _rmv(&arr, 0, NULL, arr.len, dtor) < 0)            \
                 die("%s_rmv", TO_STR(_name));                           \
                                                                         \
         for (p = data; p < data + n; p++) {                             \
@@ -79,7 +83,7 @@ _name ## _do_test(_type *data, size_t n, _type nil)                     \
                                                                         \
         for (;;) {                                                      \
                 idx = rand() % arr.len;                                 \
-                ret = _name ## _rm(&arr, idx, &v);                      \
+                ret = _name ## _rm(&arr, idx, &v, dtor);                \
                                                                         \
                 if (ret < 0)                                            \
                         die("%s_rm", TO_STR(_name));                    \
@@ -89,7 +93,7 @@ _name ## _do_test(_type *data, size_t n, _type nil)                     \
                         break;                                          \
         }                                                               \
                                                                         \
-        _name ## _free(&arr, NULL);                                     \
+        _name ## _free(&arr, dtor);                                     \
 }                                                                       \
                                                                         \
 /**                                                                     \

@@ -331,16 +331,20 @@ _name ## _add(struct _name *ap, size_t idx, _type v)            \
  * remove value from _name:                                     \
  *                                                              \
  * args:                                                        \
- *  @ap:  pointer to _name                                      \
- *  @idx: value to remove                                       \
- *  @vp:  pointer to _type (pass NULL if you do not want it)    \
+ *  @ap:    pointer to _name                                    \
+ *  @idx:  value to remove                                      \
+ *  @vp:   pointer to _type (pass NULL if you do not want it)   \
+ *  @dtor: optional destructor                                  \
  *                                                              \
  * ret:                                                         \
  *  @success: 0                                                 \
  *  @failure: -1 and errno set                                  \
  */                                                             \
 PUBLIC _link int                                                \
-_name ## _rm(struct _name *ap, size_t idx, _type *vp)           \
+_name ## _rm(struct _name *ap,                                  \
+             size_t idx,                                        \
+             _type *vp,                                         \
+             void (*dtor)(_type))                               \
 {                                                               \
         size_t shift = 0;                                       \
         _type *src = NULL;                                      \
@@ -355,8 +359,11 @@ _name ## _rm(struct _name *ap, size_t idx, _type *vp)           \
         if (_name ## _shrink_if_needed(ap) < 0)                 \
                 return -1;                                      \
                                                                 \
-        if (vp != NULL)                                         \
+        if (vp != NULL) {                                       \
                 *vp = ap->arr[idx];                             \
+        } else if (dtor != NULL) {                              \
+                dtor(ap->arr[idx]);                             \
+        }                                                       \
                                                                 \
         dst = ap->arr + idx;                                    \
         src = dst + 1;                                          \
@@ -516,16 +523,16 @@ _name ## _shrink_by(struct _name *ap, size_t amt)               \
 PRIVATE _link int                                               \
 _name ## _shrink_by_if_needed(struct _name *ap, size_t amt)     \
 {                                                               \
-        size_t new = 0;                                         \
+        size_t newlen = 0;                                      \
                                                                 \
         CTL_ARR_OK(ap);                                         \
         dbug(amt > ap->len, "amt > ap->len");                   \
                                                                 \
-        new = ap->len - amt;                                    \
-        if (new > (ap->cap / 2))                                \
+        newlen = ap->len - amt;                                 \
+        if (newlen > (ap->cap / 2))                             \
                 return 0;                                       \
                                                                 \
-        if (new < ARR_INIT_CAP)                                 \
+        if (newlen < ARR_INIT_CAP)                              \
                 return 0;                                       \
                                                                 \
         return _name ## _shrink_by(ap, amt);                    \
@@ -538,6 +545,7 @@ _name ## _shrink_by_if_needed(struct _name *ap, size_t amt)     \
  *  @ap:  pointer to _name                                      \
  *  @idx: where to add                                          \
  *  @len: length of array                                       \
+ *  @dtor: optional destructor                                  \
  *                                                              \
  * ret:                                                         \
  *  @success: 0                                                 \
@@ -547,9 +555,11 @@ PUBLIC _link int                                                \
 _name ## _rmv(struct _name *ap,                                 \
                size_t idx,                                      \
                _type *arr,                                      \
-               size_t len)                                      \
+               size_t len,                                      \
+               void (*dtor)(_type))                             \
 {                                                               \
         size_t shift = 0;                                       \
+        size_t i = 0;                                           \
         _type *src = NULL;                                      \
         _type *dst = NULL;                                      \
                                                                 \
@@ -566,6 +576,9 @@ _name ## _rmv(struct _name *ap,                                 \
                 dst = arr;                                      \
                 shift = sizeof(_type) * len;                    \
                 memcpy(dst, src, shift);                        \
+        } else if (dtor != NULL) {                              \
+                for (i = 0; i < len; i++)                       \
+                        dtor(ap->arr[idx + i]);                 \
         }                                                       \
                                                                 \
         /* is there any thing left? */                          \
