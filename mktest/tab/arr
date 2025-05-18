@@ -1,1 +1,9 @@
-uint64_t,u64_arr,u64_cmp
+uint64_t,u64_arr,u64_cmp,0,1024
+uint32_t,u32_arr,u32_cmp,0,1024
+uint16_t,u16_arr,u16_cmp,0,1024
+uint8_t,u8_arr,u8_cmp,0,128
+
+int64_t,s64_arr,s64_cmp,0,1024
+int32_t,s32_arr,s32_cmp,0,1024
+int16_t,s16_arr,s16_cmp,0,1024
+int8_t,s8_arr,s8_cmp,0,128

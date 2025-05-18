@@ -14,8 +14,26 @@ fi
 source "$CTL_ENV"
 
 # bring in library
-
 source "$CTL_BASH_LIB"
+
+# silent mode?
+silent=0
+
+# parse args
+while [ $# -ne 0 ]; do
+  case "$1" in
+    -s|--silent)
+      silent=1
+      shift
+      ;;
+    -*)
+      arg_bad "$1"
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
 
 # switch to our directory
 docdir=$(dirname $0)
@@ -24,5 +42,7 @@ cd "$docdir"
 do_or_die echo "/* $CTL_AUTO_GEN_MSG */" >"$CTL_TEST/do/arr.c"
 do_or_die echo "#include \"$CTL_LIB/lib.h\"" >>"$CTL_TEST/do/arr.c"
 do_or_die echo "#include \"$CTL_TMP/arr.h\"" >>"$CTL_TEST/do/arr.c"
+do_or_die echo "#include <time.h>" >>"$CTL_TEST/do/arr.c"
+do_or_die echo "#include <stdlib.h>" >>"$CTL_TEST/do/arr.c"
 
 do_or_die ./gen.awk -v SILENT=$silent "./tab/arr" >>"$CTL_TEST/do/arr.c"

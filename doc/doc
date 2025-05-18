@@ -27,7 +27,7 @@ while [ $# -ne 0 ]; do
       shift
       ;;
     *)
-      arg_bad "$1" "$0" 
+      arg_bad "$1"
       ;;
   esac
 done

@@ -2,9 +2,6 @@
 #define DBUG
 #endif /* #ifndef DBUG */
 
-#include "../lib/lib.h"
-#include "../tmp/arr.h"
-
 /**
  * define a new array test:
  *
@@ -94,16 +91,18 @@ _name ## _do_test(_type *data,                                          \
                                                                         \
 /**                                                                     \
  * test _name:                                                          \
+ *                                                                      \
+ * args:                                                                \
+ *  @nil:  nil value                                                    \
+ *  @n:    number of elements in data                                   \
+ *  @dtor: optional destructor                                          \
  */                                                                     \
 PUBLIC void                                                             \
-_name ## _test(void (*dtor)(_type))                                     \
+_name ## _test(_type nil, size_t n, void (*dtor)(_type))                \
 {                                                                       \
-        _type data[1024];                                               \
-        _type nil;                                                      \
-        int n = sizeof(data) / sizeof(*data);                           \
-        int i = 0;                                                      \
+        _type data[n];                                                  \
+        size_t i = 0;                                                   \
                                                                         \
-        buf_rand(&nil, sizeof(nil));                                    \
 again:                                                                  \
         buf_rand(data, sizeof(data));                                   \
         for (i = 0; i < n; i++) {                                       \
@@ -116,7 +115,7 @@ again:                                                                  \
 #include "do/arr.c"
 
 int
-main(int argc, char **argv)
+main(void)
 {
         arr_test();
 }

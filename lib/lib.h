@@ -68,33 +68,33 @@
  *  = 0 if _a = _b
  *  > 0 if _a > _b
  */
-#define NUM_CMP(_name, _numcmp, _type)  \
-/**                                     \
- * compare two numbers:                 \
- *                                      \
- * args:                                \
- *  @a: first number                    \
- *  @b: second number                   \
- *                                      \
- * ret:                                 \
- *  < 0 if _a < _b                      \
- *  = 0 if _a = _b                      \
- *  > 0 if _a > _b                      \
- */                                     \
-static inline int                       \
-_name ## _cmp(_type a, _type b)         \
-{                                       \
-        return _numcmp ## _CMP(a, b);   \
+#define NUM_CMP(_name, _numcmp, _type)          \
+/**                                             \
+ * compare two numbers:                         \
+ *                                              \
+ * args:                                        \
+ *  @a: first number                            \
+ *  @b: second number                           \
+ *                                              \
+ * ret:                                         \
+ *  < 0 if _a < _b                              \
+ *  = 0 if _a = _b                              \
+ *  > 0 if _a > _b                              \
+ */                                             \
+static inline int                               \
+_name ## _cmp(const _type a, const _type b)     \
+{                                               \
+        return _numcmp ## _CMP(a, b);           \
 }
 
 NUM_CMP(u64, INT, uint64_t)
 NUM_CMP(u32, INT, uint32_t)
 NUM_CMP(u16, INT, uint16_t)
-NUM_CMP(u8, INT, int8_t)
-NUM_CMP(su64, INT, int64_t)
-NUM_CMP(su32, INT, int32_t)
-NUM_CMP(su16, INT, int16_t)
-NUM_CMP(su8, INT, int8_t)
+NUM_CMP(u8, INT, uint8_t)
+NUM_CMP(s64, INT, int64_t)
+NUM_CMP(s32, INT, int32_t)
+NUM_CMP(s16, INT, int16_t)
+NUM_CMP(s8, INT, int8_t)
 NUM_CMP(float, FLOAT, float)
 NUM_CMP(double, FLOAT, double)
        

@@ -31,6 +31,9 @@ test_name() {
 # verbose mode?
 v=0
 
+# silent mode?
+silent=
+
 # parse args
 while [ $# -ne 0 ]; do
   case "$1" in
@@ -38,8 +41,12 @@ while [ $# -ne 0 ]; do
       v=1
       shift
       ;;
+    -s|--silent)
+      silent='-s'
+      shift
+      ;;
     *)
-      arg_bad "$1" "$0" 
+      arg_bad "$1"
       ;;
   esac
 done
@@ -85,7 +92,7 @@ for t in $CTL_TEST/*.c; do
 
   # generate test
   verbose "generating test for $name"
-  do_or_die "$CTL_MKTEST/$name"
+  do_or_die "$CTL_MKTEST/$name" "$silent"
 
   # generate makefile
   verbose 'generating Makefile'
@@ -96,7 +103,7 @@ EOF
 
   # compile test
   verbose "compiling $t"
-  do_or_die make
+  do_or_die make >/dev/null
 
   # run it
   verbose 'running test'
