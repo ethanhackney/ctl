@@ -7,3 +7,6 @@ int64_t,s64_arr,s64_cmp,0,1024
 int32_t,s32_arr,s32_cmp,0,1024
 int16_t,s16_arr,s16_cmp,0,1024
 int8_t,s8_arr,s8_cmp,0,128
+
+struct arr_test_struct,arr_test_struct_arr,arr_test_struct_cmp,{0},1024
+union arr_test_union,arr_test_union_arr,arr_test_union_cmp,{0},1024
