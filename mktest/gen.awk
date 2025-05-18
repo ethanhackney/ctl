@@ -5,7 +5,7 @@ BEGIN {
 }
 
 length($0) > 0 {
-  cmpfn = $3 # name of comparison function (or empty for default)
+  cmpfn = $3 # name of comparison function
   type  = $1 # type of array
   name  = $2 # name of array struct
   dtor  = $4 # destructor
