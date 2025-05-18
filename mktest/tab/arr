@@ -1,14 +1,14 @@
-uint64_t,u64arr
-uint32_t,u32arr
-uint16_t,u16arr
-uint8_t,u8arr
+uint64_t,u64_arr,u64_cmp
+uint32_t,u32_arr,u32_cmp
+uint16_t,u16_arr,u16_cmp
+uint8_t,u8_arr,u8_cmp
 
-int64_t,s64arr
-int32_t,s32arr
-int16_t,s16arr
-int8_t,s8arr
+int64_t,s64_arr,s64_cmp
+int32_t,s32_arr,s32_cmp
+int16_t,s16_arr,s16_cmp
+int8_t,s8_arr,s8_cmp
 
-double,doublearr
-float,floatarr
+double,double_arr,float_cmp
+float,float_arr,double_cmp
 
-char *,strarr,strcmp
+char *,str_arr,strcmp

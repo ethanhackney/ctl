@@ -14,9 +14,16 @@ fi
 source "$CTL_ENV"
 
 # bring in library
+
 source "$CTL_BASH_LIB"
 
-do_or_die echo "/* $CTL_AUTO_GEN_MSG */" >"$CTL_ROOT/test/do/arr.c"
+# switch to our directory
+docdir=$(dirname $0)
+cd "$docdir"
+
+do_or_die echo "/* $CTL_AUTO_GEN_MSG */" >"$CTL_TEST/do/arr.c"
+do_or_die echo "#include \"$CTL_LIB/lib.h\"" >>"$CTL_TEST/do/arr.c"
+do_or_die echo "#include \"$CTL_TMP/arr.h\"" >>"$CTL_TEST/do/arr.c"
 
 awk -v SILENT=$silent '
 BEGIN {
@@ -32,13 +39,6 @@ length($0) > 0 {
   # save our name for later
   names[++nnames,"name"] = name
 
-  # no comparison function given?
-  if (NF < 3) {
-    # generate one
-    printf("CTL_CMP_DEF(%s, %s)\n", name, type)
-    cmpfn = name "_cmp"
-  }
-
   # destructor?
   names[nnames,"dtor"] = NF == 4 ? dtor : "NULL"
 
@@ -48,15 +48,15 @@ length($0) > 0 {
 END {
   print ""
   print "void"
-  print "test(void)"
+  print "arr_test(void)"
   print "{"
   printf("\tprintf(\"CTL_ARR_DEF tests running...\\n\");\n")
   for (i = 1; i <= nnames; i++) {
     printf("\t%s_test(%s);\n", names[i,"name"], names[i,"dtor"])
     if (!SILENT)
-      printf("\tprintf(\"PASSED: %s_test\");\n", names[i])
+      printf("\tprintf(\"PASSED: %s_test\");\n", names[i,"name"])
   }
   printf("\tprintf(\"PASS\\n\");\n")
   print "}"
 }
-' "$CTL_ROOT/mktest/tab/arr" >>"$CTL_ROOT/test/do/arr.c"
+' "./tab/arr" >>"$CTL_TEST/do/arr.c"

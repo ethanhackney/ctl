@@ -10,11 +10,23 @@ if [ -z "$CTL_ENV" ]; then
   exit 1
 fi
 
+# compiler flags
+export CTL_CFLAGS='-Wall -Werror -pedantic'                              # compiler flags
+export CTL_TEST_CFLAGS="$CTL_CFLAGS -DDBUG -fsanitize=address,undefined" # compiler flags for tests
+
+# misc constants
 export CTL_AUTO_GEN_MSG="AUTO-GENERATED! DO NOT MODIFY" # gen file header 
-export CTL_TREE="$CTL_ROOT/.projtree"                   # project directory tree info
-export CTL_PIC="$CTL_ROOT/.projpic"                     # project directory tree picture
 export CTL_BASH_LIB="$CTL_ROOT/bashlib"                 # bash library
+export CTL_TREE="$CTL_ROOT/.projtree"                   # project directory tree info
+export CTL_LIB="$CTL_ROOT/lib"                          # c library
+export CTL_MKTEST="$CTL_ROOT/mktest"                    # test generator directory
+export CTL_PIC="$CTL_ROOT/.projpic"                     # project directory tree picture
 export CTL_DOC_GEN="$CTL_ROOT/doc"                      # documentation generator
+export CTL_TEST="$CTL_ROOT/test"                        # test directory
 export CTL_ARCH="$CTL_ROOT/arch"                        # project docs
-export CTL_LIB="$CTL_ROOT/lib/lib.c"                    # libraries
 export CTL_TMP="$CTL_ROOT/tmp"                          # templates
+
+# exit codes
+export CTL_OPT_BAD=2 # exit code for bad option
+export CTL_OPT_POS=3 # exit code for unwanted positional parameter
+export CTL_EEXIST=4  # dirent does not exist

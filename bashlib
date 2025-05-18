@@ -22,16 +22,42 @@ stderr() {
   do_or_die printf "\n"
 }
 
-# write message to stderr if v != 0:
+# print message to stderr and exit
 #
 # args:
-#  @msg: message to write
-#  @v:   verbose mode?
-do_verbose() {
+#  @msg:  message
+#  @code: exit code
+#
+# ret:
+#  exit process
+die() {
   local msg="$1"
-  local v="$2"
+  local code="$2"
 
-  if [ "$v" -ne 0 ]; then
-    stderr "$msg"
-  fi
+  stderr "$msg"
+  exit "$code"
+}
+
+# called when script hits bad argument
+#
+# args:
+#  @arg:  offending argument
+#  @path: path of script
+#
+# ret:
+#  exit process
+arg_bad() {
+  local arg="$1"
+  local path="$2"
+
+  case "$arg" in
+    -*)
+      die "$(basename $path): invalid option: $arg" "$CTL_OPT_BAD"
+      ;;
+    *)
+      die "$(basename $path): unexpected positional paramter: $arg" "$CTL_OPT_POS"
+      ;;
+  esac
+
+  die "arg_bad: argument is not invalid"
 }

@@ -246,15 +246,18 @@ _name ## _shrink_if_needed(struct _name *ap)                    \
  * remove element from end of _name:                            \
  *                                                              \
  * args:                                                        \
- *  @ap: pointer to _name                                       \
- *  @vp: pointer to _type (pass NULL if you do not want it)     \
+ *  @ap:   pointer to _name                                     \
+ *  @vp:   pointer to _type (pass NULL if you do not want it)   \
+ *  @dtor: optional destructor                                  \
  *                                                              \
  * ret:                                                         \
  *  @success: 0                                                 \
  *  @failure: -1 and errno set                                  \
  */                                                             \
 PUBLIC _link int                                                \
-_name ## _pop(struct _name *ap, _type *vp)                      \
+_name ## _pop(struct _name *ap,                                 \
+              _type *vp,                                        \
+              void (*dtor)(_type))                              \
 {                                                               \
         CTL_ARR_OK(ap);                                         \
                                                                 \

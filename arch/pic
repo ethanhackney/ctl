@@ -1,8 +1,8 @@
-[ $ROOT ]
+[ CTL_ROOT ]
     |
     +-->[ misc files ]
     |
-    +-->[ test ]
+    +-->[ CTL_TEST ]
     |       |
     |       +-->[ test files ]
     |       |
@@ -10,7 +10,7 @@
     |             |
     |             +-->[ auto generated tests ]
     |
-    +--->[ doc ]
+    +--->[ CTL_DOC_GEN ]
     |       |
     |       +--->[ doc generator scripts ]
     |       |
@@ -18,15 +18,15 @@
     |               |
     |               +-->[ doc file headers ]
     |
-    +--->[ tmp ]
+    +--->[ CTL_TMP ]
     |       |
     |       +--->[ templates ]
     |
-    +--->[ lib ]
+    +--->[ CTL_LIB ]
     |       |
     |       +--->[ library code ]
     |
-    +--->[ mktest ]
+    +--->[ CTL_MKTEST ]
             |
             +--->[ test generator scripts ]
             |

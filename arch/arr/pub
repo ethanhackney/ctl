@@ -44,15 +44,16 @@ info:
   ret:
    @success: 0
    @failure: -1 and errno set
-====================================================
-public  ${name}_pop(struct ${name} *ap, ${type} *vp)
-====================================================
+===========================================================================
+public  ${name}_pop(struct ${name} *ap, ${type} *vp, void (*dtor)(${type}))
+===========================================================================
 info:
    remove element from end of ${name}
 
   args:
-   @ap: pointer to ${name}
-   @vp: pointer to ${type} (pass NULL if you do not want it)
+   @ap:   pointer to ${name}
+   @vp:   pointer to ${type} (pass NULL if you do not want it)
+   @dtor: optional destructor
 
   ret:
    @success: 0
@@ -84,16 +85,17 @@ info:
   ret:
    @success: 0
    @failure: -1 and errno set
-===============================================================
-public  ${name}_rm(struct ${name} *ap, size_t idx, ${type} *vp)
-===============================================================
+======================================================================================
+public  ${name}_rm(struct ${name} *ap, size_t idx, ${type} *vp, void (*dtor)(${type}))
+======================================================================================
 info:
    remove value from ${name}
 
   args:
-   @ap:  pointer to ${name}
-   @idx: value to remove
-   @vp:  pointer to ${type} (pass NULL if you do not want it)
+   @ap:    pointer to ${name}
+   @idx:  value to remove
+   @vp:   pointer to ${type} (pass NULL if you do not want it)
+   @dtor: optional destructor
 
   ret:
    @success: 0
@@ -113,9 +115,9 @@ info:
   ret:
    @success: 0
    @failure: -1 and errno set
-=============================================================================
-public  ${name}_rmv(struct ${name} *ap, size_t idx, ${type} *arr, size_t len)
-=============================================================================
+====================================================================================================
+public  ${name}_rmv(struct ${name} *ap, size_t idx, ${type} *arr, size_t len, void (*dtor)(${type}))
+====================================================================================================
 info:
    remove multiple values to ${name}
 
@@ -123,6 +125,7 @@ info:
    @ap:  pointer to ${name}
    @idx: where to add
    @len: length of array
+   @dtor: optional destructor
 
   ret:
    @success: 0

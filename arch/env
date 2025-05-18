@@ -1,0 +1,16 @@
+AUTO-GENERATED! DO NOT MODIFY
+CTL_EEXIST:        dirent does not exist
+CTL_TREE:          project directory tree info
+CTL_DOC_GEN:       documentation generator
+CTL_CFLAGS:        compiler flags
+CTL_BASH_LIB:      bash library
+CTL_OPT_BAD:       exit code for bad option
+CTL_PIC:           project directory tree picture
+CTL_TEST_CFLAGS:   compiler flags for tests
+CTL_LIB:           libraries
+CTL_ARCH:          project docs
+CTL_TEST:          test directory
+CTL_TMP:           templates
+CTL_OPT_POS:       exit code for unwanted positional parameter
+CTL_MKTEST:        test generator directory
+CTL_AUTO_GEN_MSG:  gen file header 

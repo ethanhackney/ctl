@@ -2,16 +2,13 @@
 
 # bare minimum needed to work
 if [ -z "$CTL_ROOT" ]; then
-  echo "doc: CTL_ROOT undefined" 2>&1
+  echo "$(basename $0): CTL_ROOT undefined" 2>&1
   exit 1
 fi
 if [ -z "$CTL_ENV" ]; then
-  echo "doc: CTL_ENV undefined" 2>&1
+  echo "$(basename $0): CTL_ENV undefined" 2>&1
   exit 1
 fi
-
-# verbose mode?
-v=${1:-0}
 
 # grab environment
 source "$CTL_ENV"
@@ -19,13 +16,44 @@ source "$CTL_ENV"
 # source our bash library
 source "$CTL_BASH_LIB"
 
+# current directory
+olddir="$PWD"
+
+# switch back
+trap "cd $olddir" EXIT
+
+# verbose mode?
+v=0
+
+# parse args
+while [ $# -ne 0 ]; do
+  case "$1" in
+    -v|--verbose)
+      v=1
+      shift
+      ;;
+    *)
+      arg_bad "$1" "$0" 
+      ;;
+  esac
+done
+
 # print message if in verbose mode
 #
 # args:
 #  @msg: message
 verbose() {
-  do_verbose "$(basename $0): $1" "$v"
+  local msg="$1"
+
+  if [ $v != 0 ]; then
+    do_or_die echo "$(basename $0): $msg"
+  fi
 }
+
+# switch to our directory
+docdir=$(dirname $0)
+verbose "switching to $docdir"
+cd "$docdir"
 
 verbose 'generating docs...'
 
@@ -56,16 +84,21 @@ do_or_die cp "$CTL_PIC" "$CTL_ARCH/pic"
 verbose "copying \"$CTL_TREE\" to \"$CTL_ARCH/tree\""
 do_or_die cp "$CTL_TREE" "$CTL_ARCH/tree"
 
+# generate env doc
+verbose "generating env doc..."
+do_or_die echo "$CTL_AUTO_GEN_MSG" >"$CTL_ARCH/env"
+do_or_die ./env.awk "$CTL_ENV" >>"$CTL_ARCH/env"
+
 verbose 'generating doc for each template...'
 # for each template
 for ((i = 0; i < ${#tmps[@]}; i++)); do
-  tmp="${tmps[i]}"            # template name
-  hdr="$CTL_DOC_GEN/hdr/$tmp" # template doc header
-  tmpdir="$CTL_ARCH/$tmp"     # template doc directory
-  tmpsrc="$CTL_TMP/$tmp.h"    # template source
-  func="CTL_${tmp^^}_DEF"     # template function name
-  priv="$tmpdir/priv"         # private member doc file
-  pub="$tmpdir/pub"           # public member doc file
+  tmp="${tmps[i]}"         # template name
+  hdr="hdr/$tmp"           # template doc header
+  tmpdir="$CTL_ARCH/$tmp"  # template doc directory
+  tmpsrc="$CTL_TMP/$tmp.h" # template source
+  func="CTL_${tmp^^}_DEF"  # template function name
+  priv="$tmpdir/priv"      # private member doc file
+  pub="$tmpdir/pub"        # public member doc file
 
   verbose "tmps[$i].name = \"$tmp\""
   verbose "tmps[$i].func = \"$func\""
@@ -77,8 +110,7 @@ for ((i = 0; i < ${#tmps[@]}; i++)); do
 
   # fail if no header
   if ! [ -e "$hdr" ]; then
-    echo "\"$tmp\" does not have a header yet" >&2
-    exit 1
+    die "$(basename $0): \"$tmp\" does not have a header yet" "$CTL_EEXIST"
   fi
 
   # if doc directory for template not already there
@@ -94,19 +126,19 @@ for ((i = 0; i < ${#tmps[@]}; i++)); do
 
   # write header to private and public member files
   verbose "copying \"$hdr\" to \"$priv\""
-  do_or_die echo "AUTO-GENERATED!!! DO NOT MODIFY" >"$priv"
+  do_or_die echo "$CTL_AUTO_GEN_MSG" >"$priv"
   do_or_die cat "$hdr" >>"$priv"
 
   verbose "copying \"$hdr\" to \"$pub\""
   do_or_die echo "AUTO-GENERATED!!! DO NOT MODIFY" >"$pub"
   do_or_die cat "$hdr" >>"$pub"
 
-  # generate doc
-  verbose "running \"$CTL_DOC_GEN/doc.awk\" on \"$tmpsrc\" with FUNC=\"$func\", PUB=\"$pub\", PRIV=\"$priv\""
-  do_or_die "$CTL_DOC_GEN/doc.awk" \
-    -v FUNC="$func"                \
-    -v PUB="$pub"                  \
-    -v PRIV="$priv"                \
+  # generate template doc
+  verbose "running \"./tmp.awk\" on \"$tmpsrc\" with FUNC=\"$func\", PUB=\"$pub\", PRIV=\"$priv\""
+  do_or_die ./tmp.awk \
+    -v FUNC="$func" \
+    -v PUB="$pub"   \
+    -v PRIV="$priv" \
     "$tmpsrc"
 
   verbose "\"$tmp\" doc created"

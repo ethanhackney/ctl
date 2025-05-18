@@ -1,12 +1,15 @@
 #ifndef LIB_H
 #define LIB_H
 
-#include <stdlib.h>
+#include <float.h>
+#include <math.h>
 #include <stdarg.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
-#include <math.h>
-#include <float.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
 /* these help scripts find private/public functions */
 #define PRIVATE
@@ -51,27 +54,50 @@
  *  > 0 if _a > _b
  */
 #define FLOAT_CMP(_a, _b) \
-        (fabs((_a) - (_b)) < FLT_EPSILON ? 0 : (_a) - (_b) > 0 ? 1 : -1)
+        (fabs((_a) - (_b)) < FLT_EPSILON ? 0 : ((_a) - (_b)) > 0 ? 1 : -1)
 
 /**
- * compare two numbers:
+ * generate function to compare two numbers:
  *
  * args:
- *  @_a: first number
- *  @_b: second number
+ *  @_name: function name prefix 
+ *  @_type: type of arguments
  *
  * ret:
  *  < 0 if _a < _b
  *  = 0 if _a = _b
  *  > 0 if _a > _b
  */
-#define NUM_CMP(_a, _b)                                         \
-        (__builtin_types_compatible_p(typeof(_a), float) ?      \
-         FLOAT_CMP(_a, _b) :                                    \
-         __builtin_types_compatible_p(typeof(_a), double) ?     \
-         FLOAT_CMP(_a, _b) :                                    \
-         INT_CMP(_a, _b))
+#define NUM_CMP(_name, _cmp, _type)     \
+/**                                     \
+ * compare two numbers:                 \
+ *                                      \
+ * args:                                \
+ *  @a: first number                    \
+ *  @b: second number                   \
+ *                                      \
+ * ret:                                 \
+ *  < 0 if _a < _b                      \
+ *  = 0 if _a = _b                      \
+ *  > 0 if _a > _b                      \
+ */                                     \
+static inline int                       \
+_name ## _cmp(_type a, _type b)         \
+{                                       \
+        return _cmp ## _CMP(a, b);      \
+}
 
+NUM_CMP(u64, INT, uint64_t)
+NUM_CMP(u32, INT, uint32_t)
+NUM_CMP(u16, INT, uint16_t)
+NUM_CMP(u8, INT, int8_t)
+NUM_CMP(su64, INT, int64_t)
+NUM_CMP(su32, INT, int32_t)
+NUM_CMP(su16, INT, int16_t)
+NUM_CMP(su8, INT, int8_t)
+NUM_CMP(float, FLOAT, float)
+NUM_CMP(double, FLOAT, double)
+       
 /**
  * randomize contents of buffer:
  *

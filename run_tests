@@ -10,6 +10,12 @@ if [ -z "$CTL_ENV" ]; then
   exit 1
 fi
 
+# source our environment
+source "$CTL_ENV"
+
+# source our bash library
+source "$CTL_BASH_LIB"
+
 # get test name from path
 #
 # args:
@@ -40,34 +46,42 @@ test_name() {
   echo "$name"
 }
 
-# source our environment
-source "$CTL_ENV"
-
-# source our bash library
-source "$CTL_BASH_LIB"
-
-# no output run
-export silent=0
+# verbose mode?
+v=0
 
 # parse args
 while [ $# -ne 0 ]; do
   case "$1" in
-    -s|--silent)
-      silent=1
-      ;;
-    -*)
-      echo "invalid option: $1" >&2
-      exit 1
+    -v|--verbose)
+      v=1
+      shift
       ;;
     *)
-      echo "not an option: $1" >&2
-      exit 2
+      arg_bad "$1" "$0" 
       ;;
   esac
 done
 
+# print message if in verbose mode
+#
+# args:
+#  @msg: message
+verbose() {
+  local msg="$1"
+
+  if [ $v -ne 0 ]; then
+    do_or_die echo "$(basename $0): $msg"
+  fi
+}
+
+# switch to our directory
+docdir=$(dirname $0)
+verbose "switching to $docdir"
+cd "$docdir"
+
+verbose 'generating tests...'
 # for each test
-for t in $CTL_ROOT/test/*.c; do
+for t in $CTL_TEST/*.c; do
   # skip directories
   if [ -d "$t" ]; then
     continue
@@ -75,22 +89,28 @@ for t in $CTL_ROOT/test/*.c; do
 
   # get our name
   name=$(test_name $t)
+  verbose "test name is $test_name"
 
-  # make tests for this name
-  do_or_die ./mktest/$name
+  # generate test
+  verbose "generating test for $test_name"
+  do_or_die "$CTL_MKTEST/$name"
 
   # generate makefile
+  verbose 'generating Makefile'
 cat >Makefile <<EOF
 main: $t $CTL_LIB
 $(printf '\t')gcc -Wall -Werror -pedantic -DDBUG -fsanitize=address,undefined \$^
 EOF
 
   # compile test
+  verbose "compiling $t"
   do_or_die make
 
   # run it
+  verbose 'running test'
   do_or_die ./a.out
 
   # remove files
+  verbose 'removing files'
   do_or_die rm a.out Makefile
 done

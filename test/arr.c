@@ -4,10 +4,6 @@
 
 #include "../lib/lib.h"
 #include "../tmp/arr.h"
-#include <time.h>
-#include <stdint.h>
-#include <string.h>
-#include <stdio.h>
 
 /**
  * define a new array test:
@@ -100,7 +96,7 @@ _name ## _do_test(_type *data,                                          \
  * test _name:                                                          \
  */                                                                     \
 PUBLIC void                                                             \
-_name ## _test(void)                                                    \
+_name ## _test(void (*dtor)(_type))                                     \
 {                                                                       \
         _type data[1024];                                               \
         _type nil;                                                      \
@@ -111,24 +107,11 @@ _name ## _test(void)                                                    \
 again:                                                                  \
         buf_rand(data, sizeof(data));                                   \
         for (i = 0; i < n; i++) {                                       \
+                printf("here\n");                                       \
                 if (_cmp(data[i], nil) == 0)                            \
                         goto again;                                     \
         }                                                               \
-        _name ## _do_test(data, n, nil);                                \
-}
-
-/**
- * generate a comparison function:
- *
- * args:
- *  @_name: function name prefix
- *  @_type: type of arguments
- */
-#define CMP_DEF(_name, _type)                   \
-PUBLIC int                                      \
-_name ## _cmp(const _type a, const _type b)     \
-{                                               \
-        return NUM_CMP(a, b);                   \
+        _name ## _do_test(data, n, nil, dtor);                          \
 }
 
 #include "do/arr.c"
@@ -136,5 +119,5 @@ _name ## _cmp(const _type a, const _type b)     \
 int
 main(int argc, char **argv)
 {
-        test();
+        arr_test();
 }
