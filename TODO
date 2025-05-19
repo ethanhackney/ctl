@@ -1,2 +1,3 @@
 more comments
 linter
+switch ${name}_sort to use pdqsort
