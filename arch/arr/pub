@@ -188,15 +188,16 @@ info:
   ret:
    @success: index of element
    @failure: one past last valid element
-===============================================================================================
-public  ${name}_bin_rm(struct ${name} *ap, ${type} v, int (*cmp)(const ${type}, const ${type}))
-===============================================================================================
+======================================================================================================================
+public  ${name}_bin_rm(struct ${name} *ap, ${type} v, void (*dtor)(${type}), int (*cmp)(const ${type}, const ${type}))
+======================================================================================================================
 info:
    binary removal on ${name}
 
   args:
-   @ap: pointer to ${name}
-   @v:  value to remove
+   @ap:   pointer to ${name}
+   @v:    value to remove
+   @dtor: optional destructor
    @cmp:
     ret:
      < 0 if a < b
