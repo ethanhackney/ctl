@@ -1,3 +1,6 @@
 more comments
 linter
 switch ${name}_sort to use pdqsort
+change ${name}_rm to use ${name}_rmv with a pointer to element
+        and length of 1
+do the same for ${name}_add
