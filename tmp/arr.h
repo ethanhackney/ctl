@@ -163,30 +163,6 @@ _name ## _grow_if_needed(struct _name *ap)                      \
 }                                                               \
                                                                 \
 /**                                                             \
- * add value to end of _name:                                   \
- *                                                              \
- * args:                                                        \
- *  @ap: pointer to _name                                       \
- *  @v:  value to add                                           \
- *                                                              \
- * ret:                                                         \
- *  @success: 0                                                 \
- *  @failure: -1 and errno set                                  \
- */                                                             \
-PUBLIC _link int                                                \
-_name ## _push(struct _name *ap, _type v)                       \
-{                                                               \
-        CTL_ARR_OK(ap);                                         \
-                                                                \
-        if (_name ## _grow_if_needed(ap) < 0)                   \
-                return -1;                                      \
-                                                                \
-        ap->arr[ap->len] = v;                                   \
-        ap->len++;                                              \
-        return 0;                                               \
-}                                                               \
-                                                                \
-/**                                                             \
  * shrink _name:                                                \
  *                                                              \
  * args:                                                        \
@@ -240,42 +216,6 @@ _name ## _shrink_if_needed(struct _name *ap)                    \
                 return 0;                                       \
                                                                 \
         return _name ## _shrink(ap);                            \
-}                                                               \
-                                                                \
-/**                                                             \
- * remove element from end of _name:                            \
- *                                                              \
- * args:                                                        \
- *  @ap:   pointer to _name                                     \
- *  @vp:   pointer to _type (pass NULL if you do not want it)   \
- *  @dtor: optional destructor                                  \
- *                                                              \
- * ret:                                                         \
- *  @success: 0                                                 \
- *  @failure: -1 and errno set                                  \
- */                                                             \
-PUBLIC _link int                                                \
-_name ## _pop(struct _name *ap,                                 \
-              _type *vp,                                        \
-              void (*dtor)(_type))                              \
-{                                                               \
-        CTL_ARR_OK(ap);                                         \
-                                                                \
-        /* empty? */                                            \
-        if (ap->len == 0)                                       \
-                return 1;                                       \
-                                                                \
-        if (_name ## _shrink_if_needed(ap) < 0)                 \
-                return -1;                                      \
-                                                                \
-        ap->len--;                                              \
-        if (vp != NULL) {                                       \
-                *vp = ap->arr[ap->len];                         \
-        } else if (dtor != NULL) {                              \
-                dtor(ap->arr[ap->len]);                         \
-        }                                                       \
-                                                                \
-        return 0;                                               \
 }                                                               \
                                                                 \
 /**                                                             \
