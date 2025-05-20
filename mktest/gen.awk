@@ -34,7 +34,7 @@ NF >= 5 {
   nelem = $5 # number of elements in test data
 
   # save our name for later
-  ++nnames
+  nnames++
   names[nnames,"name"] = name
   names[nnames,"nil"] = nil
   names[nnames,"nelem"] = nelem

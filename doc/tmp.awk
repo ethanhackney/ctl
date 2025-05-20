@@ -50,7 +50,8 @@ in_comment && /\*\// {
 
 # still in comment?
 in_comment {
-  comment[++nc] = parse($0)
+  nc++
+  comment[nc] = parse($0)
   next
 }
 

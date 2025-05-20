@@ -42,7 +42,7 @@
  * args:
  *  @_link: linkage of generated functions
  *  @_type: type of array elements
- *  @_name: name of generated struct
+ *  @_name: name of generated struct and prefix of function names
  */
 #define CTL_ARR_DEF(_link, _type, _name)                        \
                                                                 \
@@ -289,13 +289,14 @@ _name ## _pop(struct _name *ap,                                 \
  *    = 0 if a = b                                              \
  *    > 0 if a > b                                              \
  */                                                             \
+PDQ_DEF(_link, _type, _name)                                    \
 PUBLIC _link void                                               \
 _name ## _sort(struct _name *ap,                                \
-               int (*fn)(const void *, const void *))           \
+               int (*fn)(const _type, const _type))             \
 {                                                               \
         CTL_ARR_OK(ap);                                         \
         dbug(fn == NULL, "fn == NULL");                         \
-        qsort(ap->arr, ap->len, sizeof(_type), fn);             \
+        _name ## _pdq(ap->arr, ap->len, fn);                    \
 }                                                               \
                                                                 \
 /**                                                             \
