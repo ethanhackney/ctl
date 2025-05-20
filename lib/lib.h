@@ -15,6 +15,20 @@
 #define PRIVATE
 #define PUBLIC
 
+/* glibc qsort() is actually merge sort which i do not want */
+#if defined(__GLIBC__)
+/**
+ * generate a pdqsort:
+ *
+ * args:
+ *  @_type: type of array
+ *
+ * ret:
+ *  nothing
+ */
+#else
+#endif /* #if defined(__GLIBC__) */
+
 /**
  * convert to string:
  *
@@ -25,36 +39,6 @@
  *  string of v
  */
 #define TO_STR(v) #v
-
-/**
- * compare two integers:
- *
- * args:
- *  @_a: first integer
- *  @_b: second integer
- *
- * ret:
- *  < 0 if _a < _b
- *  = 0 if _a = _b
- *  > 0 if _a > _b
- */
-#define INT_CMP(_a, _b) \
-        ((_a) <= (_b) ? ((_a) < (_b) ? -1 : 0) : 1)
-
-/**
- * compare two floats:
- *
- * args:
- *  @_a: first float
- *  @_b: second float
- *
- * ret:
- *  < 0 if _a < _b
- *  = 0 if _a = _b
- *  > 0 if _a > _b
- */
-#define FLOAT_CMP(_a, _b) \
-        (fabs((_a) - (_b)) < FLT_EPSILON ? 0 : ((_a) - (_b)) > 0 ? 1 : -1)
 
 /**
  * generate function to compare two numbers:
@@ -68,7 +52,7 @@
  *  = 0 if _a = _b
  *  > 0 if _a > _b
  */
-#define NUM_CMP(_name, _numcmp, _type)          \
+#define INT_CMP(_name, _type)                   \
 /**                                             \
  * compare two numbers:                         \
  *                                              \
@@ -84,19 +68,22 @@
 static inline int                               \
 _name ## _cmp(const _type a, const _type b)     \
 {                                               \
-        return _numcmp ## _CMP(a, b);           \
+        if (a < b)                              \
+                return -1;                      \
+        else if (a == b)                        \
+                return 0;                       \
+        else                                    \
+                return 1;                       \
 }
 
-NUM_CMP(u64, INT, uint64_t)
-NUM_CMP(u32, INT, uint32_t)
-NUM_CMP(u16, INT, uint16_t)
-NUM_CMP(u8, INT, uint8_t)
-NUM_CMP(s64, INT, int64_t)
-NUM_CMP(s32, INT, int32_t)
-NUM_CMP(s16, INT, int16_t)
-NUM_CMP(s8, INT, int8_t)
-NUM_CMP(float, FLOAT, float)
-NUM_CMP(double, FLOAT, double)
+INT_CMP(u64, uint64_t)
+INT_CMP(u32, uint32_t)
+INT_CMP(u16, uint16_t)
+INT_CMP(u8, uint8_t)
+INT_CMP(s64, int64_t)
+INT_CMP(s32, int32_t)
+INT_CMP(s16, int16_t)
+INT_CMP(s8, int8_t)
        
 /**
  * randomize contents of buffer:
