@@ -10,6 +10,8 @@
 #define CTL_ARR_INIT_CAP 32
 #endif /* #ifndef ARR_INIT_CAP */
 
+/* if debugging */
+#ifdef DBUG
 /**
  * test if state of array is valid:
  *
@@ -25,6 +27,9 @@
         dbug((_ap)->cap == 0, "ap->cap == 0");                  \
         dbug((_ap)->len > (_ap)->cap, "ap->len > ap->cap");     \
 } while (0)
+#else
+#define CTL_ARR_OK(_ap)
+#endif /* #ifdef DBUG */
 
 /**
  * iterate through array:

@@ -22,7 +22,7 @@ stderr() {
   do_or_die printf "\n"
 }
 
-# print message to stderr and exit
+# print message to stderr and exit:
 #
 # args:
 #  @msg:  message
@@ -38,7 +38,7 @@ die() {
   exit "$code"
 }
 
-# called when script hits bad argument
+# called when script hits bad argument:
 #
 # args:
 #  @arg:  offending argument
@@ -59,4 +59,19 @@ arg_bad() {
   esac
 
   die "$(basename $0): arg_bad: argument is not invalid"
+}
+
+# make a directory if it does not already exit:
+#
+# args:
+#  @path: path to directory
+mkdir_if_not() {
+  local path="$1"
+
+  if ! [ -d "$path" ]; then
+    if [ -e "$path" ]; then
+      do_or_die rm "$path"
+    fi
+    do_or_die mkdir "$path"
+  fi
 }

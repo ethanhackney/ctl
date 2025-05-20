@@ -61,79 +61,83 @@ for ((i = 0; i < ${#tmps[@]}; i++)); do
 done
 
 # setup arch directory if needed
-if ! [ -d "$CTL_ARCH" ]; then
-  verbose "\"$CTL_ARCH\" not directory"
-  if [ -e "$CTL_ARCH" ]; then
-    verbose "\"$CTL_ARCH\" something else, removing it"
-    do_or_die rm "$CTL_ARCH"
-  fi
-  # create arch directory
-  verbose "creating \"$CTL_ARCH\""
-  do_or_die mkdir "$CTL_ARCH"
-fi
+verbose "setting up arch directory"
+mkdir_if_not "$CTL_ARCH"
+
+# setup internal doc directory
+verbose "setting up internal docs"
+mkdir_if_not "$CTL_ARCH/internal"
 
 # move project structure files to arch if they are not already there
-verbose "copying \"$CTL_PIC\" to \"$CTL_ARCH/pic\""
-do_or_die cp "$CTL_PIC" "$CTL_ARCH/pic"
-verbose "copying \"$CTL_TREE\" to \"$CTL_ARCH/tree\""
-do_or_die cp "$CTL_TREE" "$CTL_ARCH/tree"
+verbose "copying \"$CTL_PIC\" to \"$CTL_ARCH/internal/pic\""
+do_or_die cp "$CTL_PIC" "$CTL_ARCH/internal/pic"
+verbose "copying \"$CTL_TREE\" to \"$CTL_ARCH/internal/tree\""
+do_or_die cp "$CTL_TREE" "$CTL_ARCH/internal/tree"
 
 # generate env doc
 verbose "generating env doc..."
-do_or_die echo "$CTL_AUTO_GEN_MSG" >"$CTL_ARCH/env"
-do_or_die ./env.awk "$CTL_ENV" >>"$CTL_ARCH/env"
+do_or_die echo "$CTL_AUTO_GEN_MSG" >"$CTL_ARCH/internal/env"
+do_or_die ./env.awk "$CTL_ENV" >>"$CTL_ARCH/internal/env"
+
+# generate user docs
+verbose "setting up user doc directory"
+mkdir_if_not "$CTL_ARCH/user"
 
 verbose 'generating doc for each template...'
 # for each template
 for ((i = 0; i < ${#tmps[@]}; i++)); do
-  tmp="${tmps[i]}"         # template name
-  hdr="hdr/$tmp"           # template doc header
-  tmpdir="$CTL_ARCH/$tmp"  # template doc directory
-  tmpsrc="$CTL_TMP/$tmp.h" # template source
-  func="CTL_${tmp^^}_DEF"  # template function name
-  priv="$tmpdir/priv"      # private member doc file
-  pub="$tmpdir/pub"        # public member doc file
+  tmp="${tmps[i]}"               # template name
+  hdr="hdr/$tmp"                 # template doc header
+  udir="$CTL_ARCH/user/$tmp"     # user doc directory
+  idir="$CTL_ARCH/internal/$tmp" # internal doc directory
+  tmpsrc="$CTL_TMP/$tmp.h"       # template source
+  func="CTL_${tmp^^}_DEF"        # template function name
+  idoc="$idir/doc"               # internal doc
+  udoc="$udir/doc"               # user doc
 
   verbose "tmps[$i].name = \"$tmp\""
   verbose "tmps[$i].func = \"$func\""
-  verbose "tmps[$i].priv = \"$priv\""
+  verbose "tmps[$i].udoc = \"$udoc\""
+  verbose "tmps[$i].idoc = \"$idoc\""
   verbose "tmps[$i].hdr  = \"$hdr\""
-  verbose "tmps[$i].dir  = \"$tmpdir\""
   verbose "tmps[$i].src  = \"$tmpsrc\""
-  verbose "tmps[$i].pub  = \"$pub\""
 
   # fail if no header
   if ! [ -e "$hdr" ]; then
     die "\"$tmp\" does not have a header yet" "$CTL_EEXIST"
   fi
 
-  # if doc directory for template not already there
-  if ! [ -d "$tmpdir" ]; then
-    verbose "\"$tmpdir\" not directory"
-    if [ -e "$tmpdir" ]; then
-      verbose "\"$tmpdir\" something else, removing it"
-      do_or_die rm "$tmpdir"
-    fi
-    verbose "creating \"$tmpdir\""
-    do_or_die mkdir "$tmpdir"
-  fi
+  # setup user doc for template
+  verbose "setting up user doc directory for $tmp"
+  mkdir_if_not "$udir"
 
-  # write header to private and public member files
-  verbose "copying \"$hdr\" to \"$priv\""
-  do_or_die echo "$CTL_AUTO_GEN_MSG" >"$priv"
-  do_or_die cat "$hdr" >>"$priv"
+  # setup internal doc for template
+  verbose "setting up internal doc directory for $tmp"
+  mkdir_if_not "$idir"
 
-  verbose "copying \"$hdr\" to \"$pub\""
-  do_or_die echo "AUTO-GENERATED!!! DO NOT MODIFY" >"$pub"
-  do_or_die cat "$hdr" >>"$pub"
+  # write header to internal doc
+  verbose "copying \"$hdr\" to \"$idoc\""
+  do_or_die echo -e "$CTL_AUTO_GEN_MSG\n" >"$idoc"
+  do_or_die cat "$hdr" >>"$idoc"
+
+  # write header to user doc
+  verbose "copying \"$hdr\" to \"$udoc\""
+  do_or_die echo -e "AUTO-GENERATED!!! DO NOT MODIFY\n" >"$udoc"
+  do_or_die cat "$hdr" >>"$udoc"
 
   # generate template doc
-  verbose "running \"./tmp.awk\" on \"$tmpsrc\" with FUNC=\"$func\", PUB=\"$pub\", PRIV=\"$priv\""
+  verbose "running \"./tmp.awk\" on \"$tmpsrc\" with FUNC=\"$func\", UDOC=\"$udoc\", IDOC=\"$idoc\""
   do_or_die ./tmp.awk \
-    -v FUNC="$func" \
-    -v PUB="$pub"   \
-    -v PRIV="$priv" \
+    -v FUNC="$func"   \
+    -v UDOC="$udoc"   \
+    -v IDOC="$idoc"   \
     "$tmpsrc"
+
+  verbose "removing last line in $udoc"
+  sed -i '$d' "$udoc"
+
+  verbose "removing last line in $idoc"
+  sed -i '$d' "$idoc"
 
   verbose "\"$tmp\" doc created"
 done

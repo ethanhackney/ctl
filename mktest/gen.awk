@@ -7,23 +7,25 @@ BEGIN {
   printf("\tint a;\n")
   printf("\tint b;\n")
   printf("\tint c;\n")
-  print "};"
+  print "};\n"
 
-  print "int arr_test_struct_cmp(const struct arr_test_struct a, const struct arr_test_struct b)"
+  print "int"
+  print "arr_test_struct_cmp(const struct arr_test_struct a, const struct arr_test_struct b)"
   print "{"
   printf("\treturn s64_cmp(a.a, b.a);\n")
-  print "}"
+  print "}\n"
 
   print "union arr_test_union {"
   printf("\tint a;\n")
   printf("\tfloat b;\n")
   printf("\tlong c;\n")
-  print "};"
+  print "};\n"
 
-  print "int arr_test_union_cmp(const union arr_test_union a, const union arr_test_union b)"
+  print "int"
+  print "arr_test_union_cmp(const union arr_test_union a, const union arr_test_union b)"
   print "{"
   printf("\treturn s64_cmp(a.a, b.a);\n")
-  print "}"
+  print "}\n"
 }
 
 NF >= 5 {
@@ -51,7 +53,7 @@ END {
   print "{"
   printf("\tsrand(time(NULL));\n")
   if (!SILENT)
-    printf("\tprintf(\"CTL_ARR_DEF tests running...\\n\");\n")
+    printf("\tprintf(\"CTL_ARR_DEF tests running...\\n\");\n\n")
   for (i = 1; i <= nnames; i++) {
     nelem = names[i,"nelem"]
     type = names[i,"type"]
@@ -61,6 +63,7 @@ END {
     printf("\t%s_test((%s)%s, %d, %s);\n", name, type, nil, nelem, dtor)
     if (!SILENT)
       printf("\tprintf(\"CTL_ARR_TEST_PASSED: %s_test\\n\");\n", names[i,"name"])
+    print ""
   }
   printf("\tprintf(\"CTL_ARR_TEST_PASSED\\n\");\n")
   print "}"

@@ -6,12 +6,12 @@ BEGIN {
     print "doc.awk: no function given"
     exit 1
   }
-  if (!PUB) {
-    print "doc.awk: no public file given"
+  if (!UDOC) {
+    print "doc.awk: no user doc file given"
     exit 1
   }
-  if (!PRIV) {
-    print "doc.awk: no private file given"
+  if (!IDOC) {
+    print "doc.awk: no internal doc file given"
     exit 1
   }
   # character used for barrier
@@ -58,8 +58,8 @@ in_comment {
 # function signature?
 /^(PUBLIC|PRIVATE)/ {
   pub = match($0, /^PUBLIC/)
-  out = pub ? PUB : PRIV
-  sig = pub ? "public " : "private "
+  out = pub ? UDOC : IDOC
+  sig = pub ? "public" : "private"
   in_sig = 1
   next
 }
@@ -80,6 +80,9 @@ in_sig && /\{/ {
   # print rest of comments
   for (c = 2; c <= nc; c++)
     print comment[c] >>out
+
+  # blank line between functions
+  print "" >>out
 
   # start over
   in_sig = 0
