@@ -12,7 +12,8 @@ fi
 
 # compiler flags
 export CTL_CFLAGS='-Wall -Werror -pedantic'                              # compiler flags
-export CTL_TEST_CFLAGS="$CTL_CFLAGS -DDBUG -fsanitize=address,undefined" # compiler flags for tests
+export CTL_FAST_CFLAGS="$CTL_CFLAGS -O3"                                 # enable optimizations
+export CTL_DBUG_CFLAGS="$CTL_CFLAGS -DDBUG -fsanitize=address,undefined" # compiler flags for tests
 
 # misc constants
 export CTL_AUTO_GEN_MSG="AUTO-GENERATED! DO NOT MODIFY" # gen file header 

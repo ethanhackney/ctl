@@ -31,6 +31,9 @@ test_name() {
 # verbose mode?
 v=0
 
+# performance test?
+perf_test=0
+
 # silent mode?
 silent=
 
@@ -43,6 +46,10 @@ while [ $# -ne 0 ]; do
       ;;
     -s|--silent)
       silent='-s'
+      shift
+      ;;
+    -p|--perf)
+      perf_test=1
       shift
       ;;
     *)
@@ -94,20 +101,30 @@ for t in $CTL_TEST/*.c; do
   verbose "generating test for $name"
   do_or_die "$CTL_MKTEST/$name" "$silent"
 
+  # is this a debugging test or a performance test?
+  if [ "$perf_test" -eq 1 ]; then
+    verbose 'doing performance test'
+    cflags="$CTL_FAST_CFLAGS"
+  else
+    verbose 'doing debug test'
+    cflags="$CTL_TEST_CFLAGS"
+  fi
+
   # generate makefile
   verbose 'generating Makefile'
 cat >Makefile <<EOF
 main: $t $CTL_LIB/lib.c
-$(printf '\t')gcc $CTL_TEST_CFLAGS \$^
+$(printf '\t')gcc $cflags \$^
 EOF
-
   # compile test
   verbose "compiling $t"
   do_or_die make >/dev/null
 
   # run it
-  verbose 'running test'
-  do_or_die ./a.out
+
+  if ! time ./a.out; then
+    die "unable to run $t"
+  fi
 
   # remove files
   verbose 'removing files'
