@@ -1,4 +1,4 @@
-#include "lib.h"
+#include "../include/util.h"
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>

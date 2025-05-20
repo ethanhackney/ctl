@@ -47,4 +47,4 @@ while [ $# -ne 0 ]; do
 done
 
 do_or_die ./doc/doc $v
-do_or_die ./run_tests $v $s $perf_test
+do_or_die ./run_tests $v $silent $perf_test

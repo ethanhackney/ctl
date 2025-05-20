@@ -48,6 +48,39 @@ info:
      = 0 if a = b
      > 0 if a > b
 
+=============================================================================
+public ${name}_addv(struct ${name} *ap, size_t idx, ${type} *arr, size_t len)
+=============================================================================
+info:
+   add multiple values to ${name}
+
+  args:
+   @ap:  pointer to ${name}
+   @idx: where to add
+   @arr: array of ${type}
+   @len: length of array
+
+  ret:
+   @success: 0
+   @failure: -1 and errno set
+
+===================================================================================================
+public ${name}_rmv(struct ${name} *ap, size_t idx, ${type} *arr, size_t len, void (*dtor)(${type}))
+===================================================================================================
+info:
+   remove multiple values to ${name}
+
+  args:
+   @ap:   pointer to ${name}
+   @idx:  where to add
+   @arr:  destination (pass NULL if do not care)
+   @len:  length of array
+   @dtor: optional destructor
+
+  ret:
+   @success: 0
+   @failure: -1 and errno set
+
 =============================================================
 public ${name}_add(struct ${name} *ap, size_t idx, ${type} v)
 =============================================================
@@ -73,38 +106,6 @@ info:
    @ap:    pointer to ${name}
    @idx:  value to remove
    @vp:   pointer to ${type} (pass NULL if you do not want it)
-   @dtor: optional destructor
-
-  ret:
-   @success: 0
-   @failure: -1 and errno set
-
-=============================================================================
-public ${name}_addv(struct ${name} *ap, size_t idx, ${type} *arr, size_t len)
-=============================================================================
-info:
-   add multiple values to ${name}
-
-  args:
-   @ap:  pointer to ${name}
-   @idx: where to add
-   @arr: array of ${type}
-   @len: length of array
-
-  ret:
-   @success: 0
-   @failure: -1 and errno set
-
-===================================================================================================
-public ${name}_rmv(struct ${name} *ap, size_t idx, ${type} *arr, size_t len, void (*dtor)(${type}))
-===================================================================================================
-info:
-   remove multiple values to ${name}
-
-  args:
-   @ap:  pointer to ${name}
-   @idx: where to add
-   @len: length of array
    @dtor: optional destructor
 
   ret:

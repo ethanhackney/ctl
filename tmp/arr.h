@@ -1,7 +1,7 @@
 #ifndef CTL_ARR_H
 #define CTL_ARR_H
 
-#include "../lib/lib.h"
+#include "../lib/include/util.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -224,109 +224,6 @@ _name ## _shrink_if_needed(struct _name *ap)                    \
 }                                                               \
                                                                 \
 /**                                                             \
- * sort _name:                                                  \
- *                                                              \
- * args:                                                        \
- *  @ap: pointer to _name                                       \
- *  @fn: comparison function                                    \
- *   ret:                                                       \
- *    < 0 if a < b                                              \
- *    = 0 if a = b                                              \
- *    > 0 if a > b                                              \
- */                                                             \
-PDQ_DEF(_link, _type, _name)                                    \
-PUBLIC _link void                                               \
-_name ## _sort(struct _name *ap,                                \
-               int (*fn)(const _type, const _type))             \
-{                                                               \
-        CTL_ARR_OK(ap);                                         \
-        dbug(fn == NULL, "fn == NULL");                         \
-        _name ## _pdq(ap->arr, ap->len, fn);                    \
-}                                                               \
-                                                                \
-/**                                                             \
- * add value to _name:                                          \
- *                                                              \
- * args:                                                        \
- *  @ap:  pointer to _name                                      \
- *  @idx: where to put v                                        \
- *  @v:   value to add                                          \
- *                                                              \
- * ret:                                                         \
- *  @success: 0                                                 \
- *  @failure: -1 and errno set                                  \
- */                                                             \
-PUBLIC _link int                                                \
-_name ## _add(struct _name *ap, size_t idx, _type v)            \
-{                                                               \
-        size_t shift = 0;                                       \
-        _type *src = NULL;                                      \
-        _type *dst = NULL;                                      \
-                                                                \
-        CTL_ARR_OK(ap);                                         \
-        dbug(idx >= ap->cap, "idx >= ap->cap");                 \
-                                                                \
-        if (_name ## _grow_if_needed(ap) < 0)                   \
-                return -1;                                      \
-                                                                \
-        src = ap->arr + idx;                                    \
-        dst = src + 1;                                          \
-        shift = sizeof(_type) * (ap->len - idx);                \
-        memmove(dst, src, shift);                               \
-                                                                \
-        ap->arr[idx] = v;                                       \
-        ap->len++;                                              \
-        return 0;                                               \
-}                                                               \
-                                                                \
-/**                                                             \
- * remove value from _name:                                     \
- *                                                              \
- * args:                                                        \
- *  @ap:    pointer to _name                                    \
- *  @idx:  value to remove                                      \
- *  @vp:   pointer to _type (pass NULL if you do not want it)   \
- *  @dtor: optional destructor                                  \
- *                                                              \
- * ret:                                                         \
- *  @success: 0                                                 \
- *  @failure: -1 and errno set                                  \
- */                                                             \
-PUBLIC _link int                                                \
-_name ## _rm(struct _name *ap,                                  \
-             size_t idx,                                        \
-             _type *vp,                                         \
-             void (*dtor)(_type))                               \
-{                                                               \
-        size_t shift = 0;                                       \
-        _type *src = NULL;                                      \
-        _type *dst = NULL;                                      \
-                                                                \
-        CTL_ARR_OK(ap);                                         \
-        dbug(idx >= ap->len, "idx >= ap->len");                 \
-                                                                \
-        if (ap->len == 0)                                       \
-                return 1;                                       \
-                                                                \
-        if (_name ## _shrink_if_needed(ap) < 0)                 \
-                return -1;                                      \
-                                                                \
-        if (vp != NULL) {                                       \
-                *vp = ap->arr[idx];                             \
-        } else if (dtor != NULL) {                              \
-                dtor(ap->arr[idx]);                             \
-        }                                                       \
-                                                                \
-        dst = ap->arr + idx;                                    \
-        src = dst + 1;                                          \
-        shift = sizeof(_type) * (ap->len - idx - 1);            \
-        memmove(src, dst, shift);                               \
-                                                                \
-        ap->len--;                                              \
-        return 0;                                               \
-}                                                               \
-                                                                \
-/**                                                             \
  * grow _name by amount:                                        \
  *                                                              \
  * args:                                                        \
@@ -382,51 +279,6 @@ _name ## _grow_by_if_needed(struct _name *ap, size_t amt)       \
                 return 0;                                       \
                                                                 \
         return _name ## _grow_by(ap, amt);                      \
-}                                                               \
-                                                                \
-/**                                                             \
- * add multiple values to _name:                                \
- *                                                              \
- * args:                                                        \
- *  @ap:  pointer to _name                                      \
- *  @idx: where to add                                          \
- *  @arr: array of _type                                        \
- *  @len: length of array                                       \
- *                                                              \
- * ret:                                                         \
- *  @success: 0                                                 \
- *  @failure: -1 and errno set                                  \
- */                                                             \
-PUBLIC _link int                                                \
-_name ## _addv(struct _name *ap,                                \
-               size_t idx,                                      \
-               _type *arr,                                      \
-               size_t len)                                      \
-{                                                               \
-        size_t shift = 0;                                       \
-        _type *src = NULL;                                      \
-        _type *dst = NULL;                                      \
-                                                                \
-        CTL_ARR_OK(ap);                                         \
-        dbug(idx >= ap->cap, "idx >= cap");                     \
-        dbug(len == 0, "len == 0");                             \
-        dbug(arr == NULL, "arr == NULL");                       \
-                                                                \
-        if (_name ## _grow_by_if_needed(ap, len) < 0)           \
-                return -1;                                      \
-                                                                \
-        src = ap->arr + idx;                                    \
-        dst = src + len;                                        \
-        shift = sizeof(_type) * (ap->len - idx);                \
-        memmove(dst, src, shift);                               \
-                                                                \
-        dst = ap->arr + idx;                                    \
-        src = arr;                                              \
-        shift = sizeof(_type) * len;                            \
-        memcpy(dst, src, shift);                                \
-                                                                \
-        ap->len += len;                                         \
-        return 0;                                               \
 }                                                               \
                                                                 \
 /**                                                             \
@@ -491,12 +343,79 @@ _name ## _shrink_by_if_needed(struct _name *ap, size_t amt)     \
 }                                                               \
                                                                 \
 /**                                                             \
- * remove multiple values to _name:                             \
+ * sort _name:                                                  \
+ *                                                              \
+ * args:                                                        \
+ *  @ap: pointer to _name                                       \
+ *  @fn: comparison function                                    \
+ *   ret:                                                       \
+ *    < 0 if a < b                                              \
+ *    = 0 if a = b                                              \
+ *    > 0 if a > b                                              \
+ */                                                             \
+PDQ_DEF(_link, _type, _name)                                    \
+PUBLIC _link void                                               \
+_name ## _sort(struct _name *ap,                                \
+               int (*fn)(const _type, const _type))             \
+{                                                               \
+        CTL_ARR_OK(ap);                                         \
+        dbug(fn == NULL, "fn == NULL");                         \
+        _name ## _pdq(ap->arr, ap->len, fn);                    \
+}                                                               \
+                                                                \
+/**                                                             \
+ * add multiple values to _name:                                \
  *                                                              \
  * args:                                                        \
  *  @ap:  pointer to _name                                      \
  *  @idx: where to add                                          \
+ *  @arr: array of _type                                        \
  *  @len: length of array                                       \
+ *                                                              \
+ * ret:                                                         \
+ *  @success: 0                                                 \
+ *  @failure: -1 and errno set                                  \
+ */                                                             \
+PUBLIC _link int                                                \
+_name ## _addv(struct _name *ap,                                \
+               size_t idx,                                      \
+               _type *arr,                                      \
+               size_t len)                                      \
+{                                                               \
+        size_t shift = 0;                                       \
+        _type *src = NULL;                                      \
+        _type *dst = NULL;                                      \
+                                                                \
+        CTL_ARR_OK(ap);                                         \
+        dbug(idx >= ap->cap, "idx >= cap");                     \
+        dbug(len == 0, "len == 0");                             \
+        dbug(arr == NULL, "arr == NULL");                       \
+                                                                \
+        if (_name ## _grow_by_if_needed(ap, len) < 0)           \
+                return -1;                                      \
+                                                                \
+        src = ap->arr + idx;                                    \
+        dst = src + len;                                        \
+        shift = sizeof(_type) * (ap->len - idx);                \
+        memmove(dst, src, shift);                               \
+                                                                \
+        dst = ap->arr + idx;                                    \
+        src = arr;                                              \
+        shift = sizeof(_type) * len;                            \
+        memcpy(dst, src, shift);                                \
+                                                                \
+        ap->len += len;                                         \
+        return 0;                                               \
+}                                                               \
+                                                                \
+/**                                                             \
+ * remove multiple values to _name:                             \
+ *                                                              \
+ * args:                                                        \
+ *  @ap:   pointer to _name                                     \
+ *  @idx:  where to add                                         \
+ *  @arr:  destination (pass NULL if do not care)               \
+ *  @len:  length of array                                      \
  *  @dtor: optional destructor                                  \
  *                                                              \
  * ret:                                                         \
@@ -544,6 +463,46 @@ _name ## _rmv(struct _name *ap,                                 \
                                                                 \
         ap->len -= len;                                         \
         return 0;                                               \
+}                                                               \
+                                                                \
+/**                                                             \
+ * add value to _name:                                          \
+ *                                                              \
+ * args:                                                        \
+ *  @ap:  pointer to _name                                      \
+ *  @idx: where to put v                                        \
+ *  @v:   value to add                                          \
+ *                                                              \
+ * ret:                                                         \
+ *  @success: 0                                                 \
+ *  @failure: -1 and errno set                                  \
+ */                                                             \
+PUBLIC _link int                                                \
+_name ## _add(struct _name *ap, size_t idx, _type v)            \
+{                                                               \
+        return _name ## _addv(ap, idx, &v, 1);                  \
+}                                                               \
+                                                                \
+/**                                                             \
+ * remove value from _name:                                     \
+ *                                                              \
+ * args:                                                        \
+ *  @ap:    pointer to _name                                    \
+ *  @idx:  value to remove                                      \
+ *  @vp:   pointer to _type (pass NULL if you do not want it)   \
+ *  @dtor: optional destructor                                  \
+ *                                                              \
+ * ret:                                                         \
+ *  @success: 0                                                 \
+ *  @failure: -1 and errno set                                  \
+ */                                                             \
+PUBLIC _link int                                                \
+_name ## _rm(struct _name *ap,                                  \
+             size_t idx,                                        \
+             _type *vp,                                         \
+             void (*dtor)(_type))                               \
+{                                                               \
+        return _name ## _rmv(ap, idx, vp, 1, dtor);             \
 }                                                               \
                                                                 \
 /**                                                             \

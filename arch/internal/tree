@@ -27,3 +27,32 @@ CTL_TEST          # tests directory
 CTL_TEST/arr.c    # dynamic array test
 CTL_TEST/do       # auto generated parts of test code
 CTL_TEST/do/arr.c # auto generated tests for dynamic array
+CTL_ROOT # root directory
+CTL_ENV  # environment
+
+CTL_ROOT/run_tests # run tests
+CTL_ROOT/Makefile  # makefile
+CTL_ENV            # environment variables
+
+CTL_DOC_GEN         # scripts for generating documentation
+CTL_DOC_GEN/doc     # script for generating all docs
+CTL_DOC_GEN/doc.awk # script for generating 1 doc
+CTL_DOC_GEN/hdr     # doc file headers
+CTL_DOC_GEN/hdr/arr # header for dynamic array doc
+
+CTL_TMP       # templates
+CTL_TMP/arr.h # dynamic array
+
+CTL_LIB       # library code
+CTL_LIB/lib.h # main library header
+CTL_LIB/lib.c # main library source
+
+CTL_MKTEST         # scripts for generating tests
+CTL_MKTEST/arr     # script for generated dynamic array test
+CTL_MKTEST/tab     # tables of data for test generators
+CTL_MKTEST/tab/arr # table for dynamic array test generator
+
+CTL_TEST          # tests directory
+CTL_TEST/arr.c    # dynamic array test
+CTL_TEST/do       # auto generated parts of test code
+CTL_TEST/do/arr.c # auto generated tests for dynamic array

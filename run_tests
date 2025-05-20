@@ -113,7 +113,7 @@ for t in $CTL_TEST/*.c; do
   # generate makefile
   verbose 'generating Makefile'
 cat >Makefile <<EOF
-main: $t $CTL_LIB/lib.c
+main: $t $CTL_LIB_SRC/util.c
 $(printf '\t')gcc $cflags \$^
 EOF
   # compile test

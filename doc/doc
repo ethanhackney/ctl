@@ -68,15 +68,19 @@ mkdir_if_not "$CTL_ARCH"
 verbose "setting up internal docs"
 mkdir_if_not "$CTL_ARCH/internal"
 
-# move project structure files to arch if they are not already there
+# generate directory tree picture
 verbose "copying \"$CTL_PIC\" to \"$CTL_ARCH/internal/pic\""
-do_or_die cp "$CTL_PIC" "$CTL_ARCH/internal/pic"
+do_or_die echo -e "$CTL_AUTO_GEN_MSG\n"  >"$CTL_ARCH/internal/pic"
+do_or_die cat "$CTL_PIC" >>"$CTL_ARCH/internal/pic"
+
+# generate directory tree paths
 verbose "copying \"$CTL_TREE\" to \"$CTL_ARCH/internal/tree\""
 do_or_die cp "$CTL_TREE" "$CTL_ARCH/internal/tree"
+do_or_die cat "$CTL_TREE" >>"$CTL_ARCH/internal/tree"
 
 # generate env doc
 verbose "generating env doc..."
-do_or_die echo "$CTL_AUTO_GEN_MSG" >"$CTL_ARCH/internal/env"
+do_or_die echo -e "$CTL_AUTO_GEN_MSG\n" >"$CTL_ARCH/internal/env"
 do_or_die ./env.awk "$CTL_ENV" >>"$CTL_ARCH/internal/env"
 
 # generate user docs

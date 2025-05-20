@@ -40,7 +40,7 @@ docdir=$(dirname $0)
 cd "$docdir"
 
 do_or_die echo -e "/* $CTL_AUTO_GEN_MSG */\n" >"$CTL_TEST/do/arr.c"
-do_or_die echo "#include \"$CTL_LIB/lib.h\"" >>"$CTL_TEST/do/arr.c"
+do_or_die echo "#include \"$CTL_LIB_INCLUDE/util.h\"" >>"$CTL_TEST/do/arr.c"
 do_or_die echo "#include \"$CTL_TMP/arr.h\"" >>"$CTL_TEST/do/arr.c"
 do_or_die echo "#include <time.h>" >>"$CTL_TEST/do/arr.c"
 do_or_die echo -e "#include <stdlib.h>\n" >>"$CTL_TEST/do/arr.c"
