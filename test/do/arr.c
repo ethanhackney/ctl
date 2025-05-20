@@ -44,25 +44,37 @@ void
 arr_test(void)
 {
 	srand(time(NULL));
+	printf("CTL_ARR_DEF tests running...\n");
+
 	u64_arr_test((uint64_t)0, 1024, NULL);
+	printf("CTL_ARR_TEST_PASSED: u64_arr_test\n");
 
 	u32_arr_test((uint32_t)0, 1024, NULL);
+	printf("CTL_ARR_TEST_PASSED: u32_arr_test\n");
 
 	u16_arr_test((uint16_t)0, 1024, NULL);
+	printf("CTL_ARR_TEST_PASSED: u16_arr_test\n");
 
 	u8_arr_test((uint8_t)0, 128, NULL);
+	printf("CTL_ARR_TEST_PASSED: u8_arr_test\n");
 
 	s64_arr_test((int64_t)0, 1024, NULL);
+	printf("CTL_ARR_TEST_PASSED: s64_arr_test\n");
 
 	s32_arr_test((int32_t)0, 1024, NULL);
+	printf("CTL_ARR_TEST_PASSED: s32_arr_test\n");
 
 	s16_arr_test((int16_t)0, 1024, NULL);
+	printf("CTL_ARR_TEST_PASSED: s16_arr_test\n");
 
 	s8_arr_test((int8_t)0, 128, NULL);
+	printf("CTL_ARR_TEST_PASSED: s8_arr_test\n");
 
 	arr_test_struct_arr_test((struct arr_test_struct){0}, 1024, NULL);
+	printf("CTL_ARR_TEST_PASSED: arr_test_struct_arr_test\n");
 
 	arr_test_union_arr_test((union arr_test_union){0}, 1024, NULL);
+	printf("CTL_ARR_TEST_PASSED: arr_test_union_arr_test\n");
 
 	printf("CTL_ARR_TEST_PASSED\n");
 }

@@ -35,6 +35,7 @@ _name ## _do_test(_type *data,                                                  
         struct _name arr = {0};                                                 \
         size_t idx = 0;                                                         \
         size_t i = 0;                                                           \
+        _type rm[5];                                                            \
         _type *p = NULL;                                                        \
         _type v;                                                                \
         int ret = 0;                                                            \
@@ -52,6 +53,9 @@ _name ## _do_test(_type *data,                                                  
         }                                                                       \
         if (_name ## _find(&arr, nil, _cmp) != arr.len)                         \
                 die("%s_find", TO_STR(_name));                                  \
+                                                                                \
+        if (_name ## _rmv(&arr, 0, rm, 5, dtor) < 0)                            \
+                die("%s_rmv", TO_STR(_name));                                   \
                                                                                 \
         if (_name ## _rmv(&arr, 0, NULL, arr.len, dtor) < 0)                    \
                 die("%s_rmv", TO_STR(_name));                                   \
