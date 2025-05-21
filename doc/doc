@@ -69,14 +69,9 @@ verbose "setting up internal docs"
 mkdir_if_not "$CTL_ARCH/internal"
 
 # generate directory tree picture
-verbose "copying \"$CTL_PIC\" to \"$CTL_ARCH/internal/pic\""
+verbose "generating directory tree picture"
 do_or_die echo -e "$CTL_AUTO_GEN_MSG\n"  >"$CTL_ARCH/internal/pic"
-do_or_die cat "$CTL_PIC" >>"$CTL_ARCH/internal/pic"
-
-# generate directory tree paths
-verbose "copying \"$CTL_TREE\" to \"$CTL_ARCH/internal/tree\""
-do_or_die cp "$CTL_TREE" "$CTL_ARCH/internal/tree"
-do_or_die cat "$CTL_TREE" >>"$CTL_ARCH/internal/tree"
+do_or_die tree "$CTL_ROOT" >>"$CTL_ARCH/internal/pic"
 
 # generate env doc
 verbose "generating env doc..."

@@ -26,23 +26,20 @@ stderr() {
 #
 # args:
 #  @msg:  message
-#  @code: exit code
 #
 # ret:
 #  exit process
 die() {
   local msg="$1"
-  local code="$2"
 
   stderr "$(basename $0): $msg"
-  exit "$code"
+  exit 1
 }
 
 # called when script hits bad argument:
 #
 # args:
 #  @arg:  offending argument
-#  @path: path of script
 #
 # ret:
 #  exit process
@@ -51,10 +48,10 @@ arg_bad() {
 
   case "$arg" in
     -*)
-      die "$(basename $0): invalid option: $arg" "$CTL_OPT_BAD"
+      die "$(basename $0): invalid option: $arg"
       ;;
     *)
-      die "$(basename $0): unexpected positional paramter: $arg" "$CTL_OPT_POS"
+      die "$(basename $0): unexpected positional paramter: $arg"
       ;;
   esac
 

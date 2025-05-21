@@ -20,6 +20,27 @@ source "$CTL_BASH_LIB"
 docdir=$(dirname $0)
 cd "$docdir"
 
+# make sure we have packages we need
+pkg=(
+  'bash' '--version'  '5.1.16(1)-release'
+  'tree' '--version'  'v2.0.2'
+  'make' '--version'  '4.3'
+  'gcc'  '--version'  '11.4.0'
+)
+for ((p = 0; p < ${#pkg[@]}; p += 3)); do
+  cmd="${pkg[p]}"
+  opt="${pkg[p + 1]}"
+  v="${pkg[p + 2]}"
+  re=$(echo "$v" | sed 's/\./\\./g')
+  if ! "$cmd" "$opt" | head -1 | grep "$re" >/dev/null 2>&1; then
+    die "require $cmd version $v"
+  fi
+done
+# mawk does not like ^^^ so have to do it separate
+if ! mawk -W v 2>/dev/null | head -1 | grep '1\.3\.4' >/dev/null; then
+  die 'require mawk version 1.3.4'
+fi
+
 # verbose mode?
 v=
 
