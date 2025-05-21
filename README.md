@@ -27,6 +27,7 @@ To build and run the project, use:
 ```
 
 > 🔧 **Note:** This script runs tests and generates documentation.
+
 > ✅ Make sure all required tools are installed before running.
 
 ---
