@@ -26,7 +26,7 @@ To build and run the project, use:
 ./run
 ```
 
-> 🔧 **Note:** This script handles compilation and setup automatically.
+> 🔧 **Note:** This script runs tests and generates documentation.
 > ✅ Make sure all required tools are installed before running.
 
 ---
@@ -39,7 +39,7 @@ User documentation is located at:
 ./arch/user
 ```
 
-> 🗂️ This folder contains usage instructions, configuration details, and interface notes.
+> 🗂️ This directory contains documentation for templates.
 
 ---
 
