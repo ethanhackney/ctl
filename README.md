@@ -1,28 +1,52 @@
 # ctl
+
 A simple STL-like library for C.
 
 ---
 
-## 📦 Requirements
+## 🎞️ Requirements
 
 The following tools must be installed and available in the system path:
 
-| Tool  | Version               | Notes                                       |
-|-------|------------------------|---------------------------------------------|
-| bash  | `5.1.16(1)-release`   | Must be located at `/bin/bash`              |
-| mawk  | `1.3.4`               | `/usr/bin/awk` must point to `mawk`         |
-| tree  | `v2.0.2`              |                                             |
-| make  | `4.3`                 |                                             |
-| gcc   | `11.4.0`              |                                             |
+| Tool | Version             | Notes                               |
+| ---- | ------------------- | ----------------------------------- |
+| bash | `5.1.16(1)-release` | Must be located at `/bin/bash`      |
+| mawk | `1.3.4`             | `/usr/bin/awk` must point to `mawk` |
+| tree | `v2.0.2`            |                                     |
+| make | `4.3`               |                                     |
+| gcc  | `11.4.0`            |                                     |
 
 ---
 
-## ⚠️ Note
+## 🚀 Getting Started
+
+To build and run the project, use:
+
+```bash
+./run
+```
+
+> 🔧 **Note:** This script handles compilation and setup automatically.
+> ✅ Make sure all required tools are installed before running.
+
+---
+
+## 📚 Documentation
+
+User documentation is located at:
+
+```
+./arch/user
+```
+
+> 🗂️ This folder contains usage instructions, configuration details, and interface notes.
+
+---
+
+## ⚠️ Compatibility
 
 This project has only been tested on:
 
-> **Pop!_OS** `6.12.10-76061203-generic`
+> **Pop!\_OS** `6.12.10-76061203-generic`
 
 It should work on other Linux distributions as well.
-
----
