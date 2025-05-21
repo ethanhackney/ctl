@@ -1,22 +1,25 @@
 CTL_ROOT # root directory
 CTL_ENV  # environment
 
-CTL_ROOT/run_tests # run tests
-CTL_ROOT/Makefile  # makefile
-CTL_ENV            # environment variables
+CTL_ROOT/bash # bash library
+CTL_ROOT/arch # architecture doc
+
+CTL_ROOT/test     # testing
+CTL_ROOT/test/run # run tests
 
 CTL_DOC_GEN         # scripts for generating documentation
 CTL_DOC_GEN/doc     # script for generating all docs
-CTL_DOC_GEN/doc.awk # script for generating 1 doc
+CTL_DOC_GEN/tmp.awk # script for generating 1 template doc
+CTL_DOC_GEN/env.awk # script for generating env doc
 CTL_DOC_GEN/hdr     # doc file headers
 CTL_DOC_GEN/hdr/arr # header for dynamic array doc
 
 CTL_TMP       # templates
 CTL_TMP/arr.h # dynamic array
 
-CTL_LIB       # library code
-CTL_LIB/lib.h # main library header
-CTL_LIB/lib.c # main library source
+CTL_LIB                # library code
+CTL_LIB/include/util.h # utilities header
+CTL_LIB/include/src.c  # utility source
 
 CTL_MKTEST         # scripts for generating tests
 CTL_MKTEST/arr     # script for generated dynamic array test
@@ -30,22 +33,25 @@ CTL_TEST/do/arr.c # auto generated tests for dynamic array
 CTL_ROOT # root directory
 CTL_ENV  # environment
 
-CTL_ROOT/run_tests # run tests
-CTL_ROOT/Makefile  # makefile
-CTL_ENV            # environment variables
+CTL_ROOT/bash # bash library
+CTL_ROOT/arch # architecture doc
+
+CTL_ROOT/test     # testing
+CTL_ROOT/test/run # run tests
 
 CTL_DOC_GEN         # scripts for generating documentation
 CTL_DOC_GEN/doc     # script for generating all docs
-CTL_DOC_GEN/doc.awk # script for generating 1 doc
+CTL_DOC_GEN/tmp.awk # script for generating 1 template doc
+CTL_DOC_GEN/env.awk # script for generating env doc
 CTL_DOC_GEN/hdr     # doc file headers
 CTL_DOC_GEN/hdr/arr # header for dynamic array doc
 
 CTL_TMP       # templates
 CTL_TMP/arr.h # dynamic array
 
-CTL_LIB       # library code
-CTL_LIB/lib.h # main library header
-CTL_LIB/lib.c # main library source
+CTL_LIB                # library code
+CTL_LIB/include/util.h # utilities header
+CTL_LIB/include/src.c  # utility source
 
 CTL_MKTEST         # scripts for generating tests
 CTL_MKTEST/arr     # script for generated dynamic array test

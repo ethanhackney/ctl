@@ -1,4 +1,3 @@
 more comments
 linter
-do the same for ${name}_add
 document DBUG mode so users can enable it for safe checking
