@@ -20,7 +20,6 @@ AUTO-GENERATED! DO NOT MODIFY
 │   │   └── arr
 │   └── tmp.awk
 ├── env
-├── file
 ├── lib
 │   ├── include
 │   │   └── util.h
@@ -43,4 +42,4 @@ AUTO-GENERATED! DO NOT MODIFY
 │   └── arr.h
 └── TODO
 
-17 directories, 24 files
+17 directories, 23 files
