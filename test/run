@@ -116,6 +116,9 @@ cat >Makefile <<EOF
 main: $t $CTL_LIB_SRC/util.c
 $(printf '\t')gcc $cflags \$^
 EOF
+  verbose 'generated makefile'
+  do_or_die cat Makefile
+
   # compile test
   verbose "compiling $t"
   do_or_die make >/dev/null
