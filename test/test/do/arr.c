@@ -43,7 +43,7 @@ ARR_TEST(union arr_test_union, arr_test_union_arr, arr_test_union_cmp)
 void
 arr_test(void)
 {
-	srand(time(NULL));
+	srand((unsigned int)time(NULL));
 	printf("CTL_ARR_DEF tests running...\n");
 
 	u64_arr_test((uint64_t)0, 1024, NULL);

@@ -555,7 +555,7 @@ _name ## _find(const struct _name *ap,                          \
  *  @success: 0                                                 \
  *  @failure: -1                                                \
  */                                                             \
-PUBLIC _link size_t                                             \
+PUBLIC _link int                                                \
 _name ## _bin_add(struct _name *ap,                             \
                   _type v,                                      \
                   int (*cmp)(const _type, const _type))         \

@@ -51,7 +51,7 @@ END {
   print "void"
   print "arr_test(void)"
   print "{"
-  printf("\tsrand(time(NULL));\n")
+  printf("\tsrand((unsigned int)time(NULL));\n")
   if (!SILENT)
     printf("\tprintf(\"CTL_ARR_DEF tests running...\\n\");\n\n")
   for (i = 1; i <= nnames; i++) {

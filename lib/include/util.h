@@ -276,7 +276,7 @@ _name ## _do_pdq(_type *arr,                                                    
         pivot = _name ## _median(arr, arr + mid, arr + len - 1, cmp);           \
         p = _name ## _part(arr, len, pivot, cmp);                               \
                                                                                 \
-        leftlen = (p - arr);                                                    \
+        leftlen = (size_t)(p - arr);                                            \
         rightlen = len - leftlen;                                               \
         _name ## _do_pdq(arr, leftlen, depth - 1, cmp);                         \
         _name ## _do_pdq(p, rightlen, depth - 1, cmp);                          \

@@ -29,5 +29,5 @@ buf_rand(void *buf, size_t sz)
 
         endp = ((uint8_t *)buf) + sz;
         for (bufp = buf; bufp < endp; bufp++)
-                *bufp = rand();
+                *bufp = (uint8_t)rand();
 }

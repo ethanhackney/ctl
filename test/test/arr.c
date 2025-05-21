@@ -88,7 +88,7 @@ _name ## _do_test(_type *data,                                                  
                 die("%s_bin_find", TO_STR(_name));                              \
                                                                                 \
         for (;;) {                                                              \
-                idx = rand() % arr.len;                                         \
+                idx = (size_t)rand() % arr.len;                                 \
                 ret = _name ## _rm(&arr, idx, &v, dtor);                        \
                                                                                 \
                 if (ret < 0)                                                    \
