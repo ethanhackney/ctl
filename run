@@ -16,6 +16,10 @@ source "$CTL_ENV"
 # source our bash library
 source "$CTL_BASH_LIB"
 
+# switch to our directory
+docdir=$(dirname $0)
+cd "$docdir"
+
 # verbose mode?
 v=
 
@@ -47,4 +51,4 @@ while [ $# -ne 0 ]; do
 done
 
 do_or_die ./doc/doc $v
-do_or_die ./run_tests $v $silent $perf_test
+do_or_die ./test/run $v $silent $perf_test

@@ -21,7 +21,7 @@ export CTL_DBUG='-DDBUG -fsanitize=address,undefined' # debugging flags
 export CTL_TEST_CFLAGS="$CTL_CFLAGS $CTL_DBUG"        # compiler flags for tests
 
 # bash libraries
-export CTL_BASH_LIB="$CTL_ROOT/bash/bashlib" # bash library
+export CTL_BASH_LIB="$CTL_ROOT/bash/lib" # bash library
 
 # project docs
 export CTL_TREE="$CTL_ROOT/.projtree" # project directory tree info
@@ -32,13 +32,13 @@ export CTL_LIB="$CTL_ROOT/lib"            # c library
 export CTL_LIB_INCLUDE="$CTL_LIB/include" # c library header files
 export CTL_LIB_SRC="$CTL_LIB/src"         # c library source files
 
-# test generation
-export CTL_MKTEST="$CTL_ROOT/mktest" # test generator directory
+# testing
+export CTL_MKTEST="$CTL_ROOT/test/mktest" # test generator directory
 
 # doc related stuff
-export CTL_DOC_GEN="$CTL_ROOT/doc" # documentation generator
-export CTL_TEST="$CTL_ROOT/test"   # test directory
-export CTL_ARCH="$CTL_ROOT/arch"   # project docs
+export CTL_DOC_GEN="$CTL_ROOT/doc"    # documentation generator
+export CTL_TEST="$CTL_ROOT/test/test" # test directory
+export CTL_ARCH="$CTL_ROOT/arch"      # project docs
 
 # exit codes
 export CTL_OPT_BAD=2 # exit code for bad option
