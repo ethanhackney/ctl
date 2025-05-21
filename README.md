@@ -1,18 +1,28 @@
 # ctl
-stl for c
+A simple STL-like library for C.
 
-# require
-bash 5.1.16(1)-release (required to be at /bin/bash)
+---
 
-mawk 1.3.4 (required for /usr/bin/awk to link to mawk)
+## 📦 Requirements
 
-tree v2.0.2
+The following tools must be installed and available in the system path:
 
-make 4.3
+| Tool  | Version               | Notes                                       |
+|-------|------------------------|---------------------------------------------|
+| bash  | `5.1.16(1)-release`   | Must be located at `/bin/bash`              |
+| mawk  | `1.3.4`               | `/usr/bin/awk` must point to `mawk`         |
+| tree  | `v2.0.2`              |                                             |
+| make  | `4.3`                 |                                             |
+| gcc   | `11.4.0`              |                                             |
 
-gcc  11.4.0
+---
 
-# note
-has only been tested on (pop-os 6.12.10-76061203-generic) but
+## ⚠️ Note
 
-should work fine on other linux distros
+This project has only been tested on:
+
+> **Pop!_OS** `6.12.10-76061203-generic`
+
+It should work on other Linux distributions as well.
+
+---
