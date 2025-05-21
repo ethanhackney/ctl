@@ -21,7 +21,7 @@ export CTL_DBUG='-DDBUG -fsanitize=address,undefined' # debugging flags
 export CTL_TEST_CFLAGS="$CTL_CFLAGS $CTL_DBUG"        # compiler flags for tests
 
 # bash libraries
-export CTL_BASH_LIB="$CTL_ROOT/bashlib" # bash library
+export CTL_BASH_LIB="$CTL_ROOT/bash/bashlib" # bash library
 
 # project docs
 export CTL_TREE="$CTL_ROOT/.projtree" # project directory tree info
