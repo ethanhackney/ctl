@@ -2,3 +2,4 @@ more comments
 linter
 document DBUG mode so users can enable it for safe checking
 add dbug() statements to pdq generator
+create man page for CTL_ARR
