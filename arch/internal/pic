@@ -1,6 +1,7 @@
 AUTO-GENERATED! DO NOT MODIFY
 
 /home/ethanhackney/code/ctl
+├── a.out
 ├── arch
 │   ├── internal
 │   │   ├── arr
@@ -25,6 +26,8 @@ AUTO-GENERATED! DO NOT MODIFY
 │   │   └── util.h
 │   └── src
 │       └── util.c
+├── main.c
+├── Makefile
 ├── README.md
 ├── run
 ├── test
@@ -39,7 +42,8 @@ AUTO-GENERATED! DO NOT MODIFY
 │       └── do
 │           └── arr.c
 ├── tmp
-│   └── arr.h
+│   ├── arr.h
+│   └── map.h
 └── TODO
 
-17 directories, 23 files
+17 directories, 27 files

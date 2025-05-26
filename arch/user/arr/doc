@@ -192,3 +192,16 @@ info:
   ret:
    @success: 0
    @failure: -1
+
+============================================
+public ${name}_len(const struct ${name} *ap)
+============================================
+info:
+   get length of ${name}
+
+  args:
+   @ap: pointer to ${name}
+
+  ret:
+   @success: length of array
+   @failure: does not

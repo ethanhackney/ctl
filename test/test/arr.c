@@ -46,25 +46,28 @@ _name ## _do_test(_type *data,                                                  
         if (_name ## _addv(&arr, 0, data, n) < 0)                               \
                 die("%s_addv", TO_STR(_name));                                  \
                                                                                 \
+        if (_name ## _len(&arr) != n)                                           \
+                die("%s_addv did not update length");                           \
+                                                                                \
         CTL_ARR_FOR_EACH(&arr, p) {                                             \
                 i = _name ## _find(&arr, *p, _cmp);                             \
-                if (i == arr.len)                                               \
+                if (i == _name ## _len(&arr))                                   \
                         die("%s_find", TO_STR(_name));                          \
         }                                                                       \
-        if (_name ## _find(&arr, nil, _cmp) != arr.len)                         \
+        if (_name ## _find(&arr, nil, _cmp) != _name ## _len(&arr))             \
                 die("%s_find", TO_STR(_name));                                  \
                                                                                 \
         if (_name ## _rmv(&arr, 0, rm, 5, dtor) < 0)                            \
                 die("%s_rmv", TO_STR(_name));                                   \
                                                                                 \
-        if (_name ## _rmv(&arr, 0, NULL, arr.len, dtor) < 0)                    \
+        if (_name ## _rmv(&arr, 0, NULL, _name ## _len(&arr), dtor) < 0)        \
                 die("%s_rmv", TO_STR(_name));                                   \
                                                                                 \
         if (_name ## _addv(&arr, 0, data, n) < 0)                               \
                 die("%s_addv", TO_STR(_name));                                  \
                                                                                 \
         _name ## _sort(&arr, _cmp);                                             \
-        for (i = 0; i < arr.len - 1; i++) {                                     \
+        for (i = 0; i < _name ## _len(&arr) - 1; i++) {                         \
                 if (_cmp(arr.arr[i], arr.arr[i + 1]) > 0)                       \
                         die("arr not sorted after %s_sort", TO_STR(_name));     \
         }                                                                       \
@@ -74,28 +77,28 @@ _name ## _do_test(_type *data,                                                  
                         die("%s_bin_add", TO_STR(_name));                       \
         }                                                                       \
                                                                                 \
-        for (i = 0; i < arr.len - 1; i++) {                                     \
+        for (i = 0; i < _name ## _len(&arr) - 1; i++) {                         \
                 if (_cmp(arr.arr[i], arr.arr[i + 1]) > 0)                       \
                         die("arr not sorted after %s_bin_add", TO_STR(_name));  \
         }                                                                       \
                                                                                 \
         CTL_ARR_FOR_EACH(&arr, p) {                                             \
                 idx = _name ## _bin_find(&arr, *p, _cmp);                       \
-                if (idx == arr.len)                                             \
+                if (idx == _name ## _len(&arr))                                 \
                         die("%s_bin_find", TO_STR(_name));                      \
         }                                                                       \
-        if (_name ## _bin_find(&arr, nil, _cmp) != arr.len)                     \
+        if (_name ## _bin_find(&arr, nil, _cmp) != _name ## _len(&arr))         \
                 die("%s_bin_find", TO_STR(_name));                              \
                                                                                 \
         for (;;) {                                                              \
-                idx = (size_t)rand() % arr.len;                                 \
+                idx = (size_t)rand() % _name ## _len(&arr);                     \
                 ret = _name ## _rm(&arr, idx, &v, dtor);                        \
                                                                                 \
                 if (ret < 0)                                                    \
                         die("%s_rm", TO_STR(_name));                            \
                 else if (ret > 0)                                               \
                         break;                                                  \
-                else if (arr.len == 0)                                          \
+                else if (_name ## _len(&arr) == 0)                              \
                         break;                                                  \
         }                                                                       \
                                                                                 \

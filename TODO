@@ -2,3 +2,4 @@ more comments
 linter
 document DBUG mode so users can enable it for safe checking
 create man page for CTL_ARR
+document macros  that can be defined by user

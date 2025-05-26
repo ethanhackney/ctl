@@ -52,9 +52,9 @@
 #define CTL_ARR_DEF(_link, _type, _name)                        \
                                                                 \
 struct _name {                                                  \
-        size_t  cap; /* physical length of array */             \
-        size_t  len; /* logical length of array */              \
-        _type  *arr; /* heap array of _type */                  \
+        size_t  cap; /* private: physical length of array */    \
+        size_t  len; /* private: logical length of array */     \
+        _type  *arr; /* private: heap array of _type */         \
 };                                                              \
                                                                 \
 /**                                                             \
@@ -688,6 +688,23 @@ _name ## _bin_rm(struct _name *ap,                              \
                 return 0;                                       \
                                                                 \
         return _name ## _rm(ap, i, NULL, dtor);                 \
+}                                                               \
+                                                                \
+/**                                                             \
+ * get length of _name:                                         \
+ *                                                              \
+ * args:                                                        \
+ *  @ap: pointer to _name                                       \
+ *                                                              \
+ * ret:                                                         \
+ *  @success: length of array                                   \
+ *  @failure: does not                                          \
+ */                                                             \
+PUBLIC size_t                                                   \
+_name ## _len(const struct _name *ap)                           \
+{                                                               \
+        CTL_ARR_OK(ap);                                         \
+        return ap->len;                                         \
 }
 
 #endif /* #ifndef CTL_ARR_H */
