@@ -1,7 +1,7 @@
-#ifndef CTL_MAP_H
-#define CTL_MAP_H
+#ifndef CTL_HASH_H
+#define CTL_HASH_H
 
-#include "../lib/include/util.h"
+#include "../../lib/include/util.h"
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
@@ -9,14 +9,14 @@
 
 /* if 64-bit */
 #if UINTPTR_MAX == 0xFFFFFFFFFFFFFFFF
-typedef uint64_t ctl_map_size_t;
+typedef uint64_t ctl_hash_size_t;
 #else
-typedef uint32_t ctl_map_size_t;
+typedef uint32_t ctl_hash_size_t;
 #endif /* #ifdef UINTPTR_MAX == 0xFFFFFFFFFFFFFFFF */
 
 /* misc. constants */
 enum {
-        CTL_MAP_INIT_CAP = 32, /* init capacity (must be power of 2) */
+        CTL_HASH_INIT_CAP = 32, /* init capacity (must be power of 2) */
 };
 
 /* if 64-bit */
@@ -34,26 +34,27 @@ enum {
  *  @success: hash of key
  *  @failure: does not
  */
-static inline ctl_map_size_t
-ctl_map_hash(const void *key,
-             ctl_map_size_t len,
-             ctl_map_size_t seed,
-             ctl_map_size_t cap)
+static inline ctl_hash_size_t
+ctl_hash_hash(const void *key,
+             ctl_hash_size_t len,
+             ctl_hash_size_t seed,
+             ctl_hash_size_t cap)
 {
-        const ctl_map_size_t *blocks = NULL;
-        const ctl_map_size_t *tail = NULL;
-        ctl_map_size_t nblocks = 0;
-        ctl_map_size_t c0 = 0;
-        ctl_map_size_t c1 = 0;
-        ctl_map_size_t h0 = 0;
-        ctl_map_size_t h1 = 0;
-        ctl_map_size_t k0 = 0;
-        ctl_map_size_t k1 = 0;
-        ctl_map_size_t i = 0;
+        const ctl_hash_size_t *blocks = NULL;
+        const ctl_hash_size_t *tail = NULL;
+        ctl_hash_size_t nblocks = 0;
+        ctl_hash_size_t c0 = 0;
+        ctl_hash_size_t c1 = 0;
+        ctl_hash_size_t h0 = 0;
+        ctl_hash_size_t h1 = 0;
+        ctl_hash_size_t k0 = 0;
+        ctl_hash_size_t k1 = 0;
+        ctl_hash_size_t i = 0;
 
         dbug(key == NULL, "key == NULL");
         dbug(len == 0, "len == 0");
         dbug(seed == 0, "seed == 0");
+        dbug(cap < CTL_HASH_INIT_CAP, "cap < CTL_HASH_INIT_CAP");
 
         c0 = 0x87c37b91114253d5ULL;
         c1 = 0x4cf5ad432745937fULL;
@@ -62,7 +63,7 @@ ctl_map_hash(const void *key,
         h1 = seed;
 
         nblocks = len / 16;
-        blocks = (const uint64_t *)key;
+        blocks = (const ctl_hash_size_t *)key;
 
         for (i = 0; i < nblocks; i++) {
                 k0 = blocks[i * 2 + 0];
@@ -91,40 +92,40 @@ ctl_map_hash(const void *key,
         k0 = 0;
         k1 = 0;
         switch (len & 15) {
-        case 15: k1 ^= ((ctl_map_size_t)tail[14]) << 48;
+        case 15: k1 ^= ((ctl_hash_size_t)tail[14]) << 48;
                  /* fallthrough */
-        case 14: k1 ^= ((ctl_map_size_t)tail[13]) << 40;
+        case 14: k1 ^= ((ctl_hash_size_t)tail[13]) << 40;
                  /* fallthrough */
-        case 13: k1 ^= ((ctl_map_size_t)tail[12]) << 32;
+        case 13: k1 ^= ((ctl_hash_size_t)tail[12]) << 32;
                  /* fallthrough */
-        case 12: k1 ^= ((ctl_map_size_t)tail[11]) << 24;
+        case 12: k1 ^= ((ctl_hash_size_t)tail[11]) << 24;
                  /* fallthrough */
-        case 11: k1 ^= ((ctl_map_size_t)tail[10]) << 16;
+        case 11: k1 ^= ((ctl_hash_size_t)tail[10]) << 16;
                  /* fallthrough */
-        case 10: k1 ^= ((ctl_map_size_t)tail[9])  <<  8;
+        case 10: k1 ^= ((ctl_hash_size_t)tail[9])  <<  8;
                  /* fallthrough */
-        case  9: k1 ^= ((ctl_map_size_t)tail[8])  <<  0;
+        case  9: k1 ^= ((ctl_hash_size_t)tail[8])  <<  0;
                  /* fallthrough */
                  k1 *= c1;
                  k1 = (k1 << 33) | (k1 >> (64 - 33));
                  k1 *= c0;
                  h1 ^= k1;
                  /* fallthrough */
-        case 8: k1 ^= ((ctl_map_size_t)tail[7]) << 48;
+        case 8: k1 ^= ((ctl_hash_size_t)tail[7]) << 48;
                  /* fallthrough */
-        case 7: k1 ^= ((ctl_map_size_t)tail[6]) << 40;
+        case 7: k1 ^= ((ctl_hash_size_t)tail[6]) << 40;
                  /* fallthrough */
-        case 6: k1 ^= ((ctl_map_size_t)tail[5]) << 32;
+        case 6: k1 ^= ((ctl_hash_size_t)tail[5]) << 32;
                  /* fallthrough */
-        case 5: k1 ^= ((ctl_map_size_t)tail[4]) << 24;
+        case 5: k1 ^= ((ctl_hash_size_t)tail[4]) << 24;
                  /* fallthrough */
-        case 4: k1 ^= ((ctl_map_size_t)tail[3]) << 16;
+        case 4: k1 ^= ((ctl_hash_size_t)tail[3]) << 16;
                  /* fallthrough */
-        case 3: k1 ^= ((ctl_map_size_t)tail[2]) <<  8;
+        case 3: k1 ^= ((ctl_hash_size_t)tail[2]) <<  8;
                  /* fallthrough */
-        case 2: k1 ^= ((ctl_map_size_t)tail[1]) <<  0;
+        case 2: k1 ^= ((ctl_hash_size_t)tail[1]) <<  0;
                  /* fallthrough */
-        case 1: k1 ^= ((ctl_map_size_t)tail[0]) <<  0;
+        case 1: k1 ^= ((ctl_hash_size_t)tail[0]) <<  0;
                  /* fallthrough */
                 k0 *= c0;
                 k0 = (k0 << 31) | (k0 >> (64 - 31));
@@ -153,17 +154,17 @@ ctl_map_hash(const void *key,
         return (h0 + h1) & (cap - 1);
 }
 #else
-static inline ctl_map_size_t
-ctl_map_hash(const void *key,
-             ctl_map_size_t len,
-             ctl_map_size_t seed,
-             ctl_map_size_t cap)
+static inline ctl_hash_size_t
+ctl_hash_hash(const void *key,
+              ctl_hash_size_t len,
+              ctl_hash_size_t seed,
+              ctl_hash_size_t cap)
 {
-        ctl_map_size_t c0 = 0;
-        ctl_map_size_t c1 = 0;
-        ctl_map_size_t h = 0;
-        ctl_map_size_t i = 0;
-        ctl_map_size_t k = 0;
+        ctl_hash_size_t c0 = 0;
+        ctl_hash_size_t c1 = 0;
+        ctl_hash_size_t h = 0;
+        ctl_hash_size_t i = 0;
+        ctl_hash_size_t k = 0;
         uint8_t *kp = NULL;
 
         c0 = 0xcc9e2d51;
@@ -172,14 +173,15 @@ ctl_map_hash(const void *key,
         dbug(key == NULL, "key == NULL");
         dbug(len == 0, "len == 0");
         dbug(seed == 0, "seed == 0");
+        dbug(cap < CTL_HASH_INIT_CAP, "cap < CTL_HASH_INIT_CAP");
 
         h = seed;
         kp = (const uint8_t *)key;
         while (i >= 4) {
-                k =   (ctl_map_size_t)kp[i];
-                k |= ((ctl_map_size_t)kp[i + 1] << 8);
-                k |= ((ctl_map_size_t)kp[i + 2] << 16);
-                k |= ((ctl_map_size_t)kp[i + 3] << 24);
+                k =   (ctl_hash_size_t)kp[i];
+                k |= ((ctl_hash_size_t)kp[i + 1] << 8);
+                k |= ((ctl_hash_size_t)kp[i + 2] << 16);
+                k |= ((ctl_hash_size_t)kp[i + 3] << 24);
 
                 k *= c0;
                 k = (k << 15) | (k >> (32 - 15));
@@ -218,35 +220,4 @@ ctl_map_hash(const void *key,
 }
 #endif /* #ifdef UINTPTR_MAX == 0xFFFFFFFFFFFFFFFF */
 
-/**
- * define a new dynamic map:
- *
- * args:
- *  @_link:  linkage of generated functions
- *  @_ktype: key type of array elements
- *  @_vtype: value type of array elements
- *  @_name:  name of generated struct and prefix of function names
- */
-#define CTL_MAP_DEF(_link, _ktype, _vtype, _name)                       \
-                                                                        \
-/* key-value pair */                                                    \
-struct _name ## _kvp {                                                  \
-        ctl_map_size_t kv_klen; /* public: key length */                \
-        _ktype         kv_key;  /* public: key */                       \
-        _vtype         kv_val;  /* public: value */                     \
-};                                                                      \
-                                                                        \
-/* map link */                                                          \
-struct _name ## _link {                                                 \
-        struct _name ## _link  *next; /* private: next on list */       \
-        struct _name ## _link **prev; /* private: previous on list */   \
-        struct _name ## _kvp    kvp;  /* private: key-value pair */     \
-        ctl_map_size_t          hash; /* private: saved hash */         \
-};
-
-/* map list */
-struct _name ## _list {
-        struct _name ## _link *head;
-};
-
-#endif /* #ifndef CTL_MAP_H */
+#endif /* #ifndef CTL_HASH_H */

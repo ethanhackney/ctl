@@ -128,7 +128,7 @@ again:                                                                          
         _name ## _do_test(data, n, nil, dtor);                                  \
 }
 
-#include "do/arr.c"
+#include "do/list/arr.c"
 
 int
 main(void)

@@ -4,21 +4,22 @@ AUTO-GENERATED! DO NOT MODIFY
 ├── a.out
 ├── arch
 │   ├── internal
-│   │   ├── arr
-│   │   │   └── doc
 │   │   ├── env
+│   │   ├── list
+│   │   │   └── arr
 │   │   ├── pic
 │   │   └── tree
 │   └── user
-│       └── arr
-│           └── doc
+│       └── list
+│           └── arr
 ├── bash
 │   └── lib
 ├── doc
 │   ├── doc
 │   ├── env.awk
 │   ├── hdr
-│   │   └── arr
+│   │   └── list
+│   │       └── arr
 │   └── tmp.awk
 ├── env
 ├── lib
@@ -35,15 +36,20 @@ AUTO-GENERATED! DO NOT MODIFY
 │   │   ├── arr
 │   │   ├── gen.awk
 │   │   └── tab
-│   │       └── arr
+│   │       └── list
+│   │           └── arr
 │   ├── run
 │   └── test
 │       ├── arr.c
 │       └── do
-│           └── arr.c
+│           └── list
+│               └── arr.c
 ├── tmp
-│   ├── arr.h
-│   └── map.h
+│   ├── hash
+│   │   ├── hash.h
+│   │   └── slist.h
+│   └── list
+│       └── arr.h
 └── TODO
 
-17 directories, 27 files
+22 directories, 28 files

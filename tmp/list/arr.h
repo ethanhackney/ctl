@@ -1,7 +1,7 @@
 #ifndef CTL_ARR_H
 #define CTL_ARR_H
 
-#include "../lib/include/util.h"
+#include "../../lib/include/util.h"
 #include <stdlib.h>
 #include <string.h>
 

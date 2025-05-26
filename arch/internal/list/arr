@@ -10,6 +10,7 @@ args:
  @link: linkage of generated functions
  @type: type of array elements
  @name: name of generated struct and prefix of all function names
+
 ========================================
 private ${name}_grow(struct ${name} *ap)
 ========================================

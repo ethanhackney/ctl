@@ -65,10 +65,13 @@ arg_bad() {
 mkdir_if_not() {
   local path="$1"
 
-  if ! [ -d "$path" ]; then
-    if [ -e "$path" ]; then
-      do_or_die rm "$path"
-    fi
-    do_or_die mkdir "$path"
+  if [ -d "$path" ]; then
+    return
   fi
+
+  if [ -e "$path" ]; then
+    do_or_die rm "$path"
+  fi
+
+  do_or_die mkdir -p "$path"
 }
