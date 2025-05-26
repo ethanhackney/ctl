@@ -69,7 +69,7 @@ _name ## _do_test(_type *data,                                                  
                         die("arr not sorted after %s_sort", TO_STR(_name));     \
         }                                                                       \
                                                                                 \
-        for (p = data; p < data + n; p++) {                                     \
+        for (p = data; (size_t)p < (size_t)data + n; p++) {                     \
                 if (_name ## _bin_add(&arr, *p, _cmp) < 0)                      \
                         die("%s_bin_add", TO_STR(_name));                       \
         }                                                                       \
