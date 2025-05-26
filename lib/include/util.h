@@ -50,6 +50,10 @@ _name ## _isort(_type *arr, size_t len, int (*cmp)(const _type, const _type))   
         size_t j = 0;                                                           \
         _type v;                                                                \
                                                                                 \
+        dbug(arr == NULL, "arr == NULL");                                       \
+        dbug(len == 0, "len == 0");                                             \
+        dbug(cmp == NULL, "cmp == NULL");                                       \
+                                                                                \
         for (i = 1; i < len; i++) {                                             \
                 v = arr[i];                                                     \
                 for (j = i; j > 0; j--) {                                       \
@@ -80,6 +84,12 @@ _name ## _heapify(_type *arr,                                                   
         size_t left = 0;                                                        \
         size_t right = 0;                                                       \
         _type tmp;                                                              \
+                                                                                \
+        dbug(arr == NULL, "arr == NULL");                                       \
+        dbug(len == 0, "len == 0");                                             \
+        dbug(root >= len, "root >= len");                                       \
+        dbug(cmp == NULL, "cmp == NULL");                                       \
+                                                                                \
                                                                                 \
         for (;;) {                                                              \
                 max = root;                                                     \
@@ -123,6 +133,11 @@ _name ## _heapsort(_type *arr,                                                  
         size_t i = 0;                                                           \
         _type tmp;                                                              \
                                                                                 \
+        dbug(arr == NULL, "arr == NULL");                                       \
+        dbug(len == 0, "len == 0");                                             \
+        dbug(cmp == NULL, "cmp == NULL");                                       \
+                                                                                \
+                                                                                \
         for (i = len / 2; i > 0; i--)                                           \
                 _name ## _heapify(arr, len, i - 1, cmp);                        \
                                                                                 \
@@ -154,6 +169,10 @@ _name ## _is_sorted(_type *arr,                                                 
 {                                                                               \
         size_t i = 0;                                                           \
                                                                                 \
+        dbug(arr == NULL, "arr == NULL");                                       \
+        dbug(len == 0, "len == 0");                                             \
+        dbug(cmp == NULL, "cmp == NULL");                                       \
+                                                                                \
         for (i = 1; i < len; i++) {                                             \
                 if (cmp(arr[i], arr[i - 1]) < 0)                                \
                         return false;                                           \
@@ -184,6 +203,11 @@ _name ## _median(_type *a,                                                      
         int bc_diff = 0;                                                        \
         int ac_diff = 0;                                                        \
                                                                                 \
+        dbug(a == NULL, "a == NULL");                                           \
+        dbug(b == NULL, "b == NULL");                                           \
+        dbug(c == NULL, "c == NULL");                                           \
+        dbug(cmp == NULL, "cmp == NULL");                                       \
+                                                                                \
         ab_diff = cmp(*a, *b);                                                  \
         bc_diff = cmp(*b, *c);                                                  \
         ac_diff = cmp(*a, *c);                                                  \
@@ -210,13 +234,17 @@ _name ## _median(_type *a,                                                      
  */                                                                             \
 _link _type *                                                                   \
 _name ## _part(_type *arr,                                                      \
-                  size_t len,                                                   \
-                  _type pivot,                                                  \
-                  int (*cmp)(const _type, const _type))                         \
+               size_t len,                                                      \
+               _type pivot,                                                     \
+               int (*cmp)(const _type, const _type))                            \
 {                                                                               \
         _type *p = NULL;                                                        \
         _type *end = NULL;                                                      \
         _type tmp;                                                              \
+                                                                                \
+        dbug(arr == NULL, "arr == NULL");                                       \
+        dbug(len == 0, "len == 0");                                             \
+        dbug(cmp == NULL, "cmp == NULL");                                       \
                                                                                 \
         p = arr;                                                                \
         end = p + len;                                                          \
@@ -259,6 +287,10 @@ _name ## _do_pdq(_type *arr,                                                    
         _type *p = NULL;                                                        \
         _type pivot;                                                            \
                                                                                 \
+        dbug(arr == NULL, "arr == NULL");                                       \
+        dbug(len == 0, "len == 0");                                             \
+        dbug(cmp == NULL, "cmp == NULL");                                       \
+                                                                                \
         if (len <= PDQ_THRESH) {                                                \
                 _name ## _isort(arr, len, cmp);                                 \
                 return;                                                         \
@@ -296,6 +328,10 @@ _name ## _pdq(_type *arr,                                                       
              size_t len,                                                        \
              int (*cmp)(const _type, const _type))                              \
 {                                                                               \
+        dbug(arr == NULL, "arr == NULL");                                       \
+        dbug(len == 0, "len == 0");                                             \
+        dbug(cmp == NULL, "cmp == NULL");                                       \
+                                                                                \
         _name ## _do_pdq(arr, len, PDQ_RECUR, cmp);                             \
 }
 
