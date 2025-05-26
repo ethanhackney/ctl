@@ -18,8 +18,8 @@ CFLAGS = -Wall  		\
 	-Wno-unused-parameter   \
 	-pedantic
 FFLAGS  = $(CFLAGS) -O3
-DFLAGS  = $(CFLAGS) -fsanitize=address,undefined
-SRC     = main.c
+DFLAGS  = $(CFLAGS) -DDBUG -fsanitize=address,undefined
+SRC     = main.c lib/src/util.c
 CC      = gcc
 
 safe:
