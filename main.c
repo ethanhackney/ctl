@@ -23,7 +23,7 @@ main(void)
         char buf[BUFSIZ] = "";
         char *dup = NULL;
 
-        if (str2intmap_init(NULL, 0, str_cmp) < 0)
+        if (str2intmap_init(&map, 0, str_cmp) < 0)
                 die("str2intmap_init");
 
         while (fgets(buf, BUFSIZ, stdin) != NULL) {

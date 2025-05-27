@@ -28,25 +28,8 @@
         dbug((_ap)->cap < CTL_ARR_INIT_CAP, "ap->cap < CTL_ARR_INIT_CAP0");     \
         dbug((_ap)->len > (_ap)->cap, "ap->len > ap->cap");                     \
 } while (0)
-
-/**
- * do dbug:
- *
- * args:
- *  @_cond: condition
- *  @_fmt:  format string
- *  @...:   arguments
- *
- * ret:
- *  @success: nothing
- *  @failure: exit process
- */
-#define CTL_ARR_DBUG(_cond, _fmt, ...) \
-        dbug(_cond, _fmt, ##__VA_ARGS__)
-
 #else
-#define CTL_ARR_OK(_ap)                /* no-op */
-#define CTL_ARR_DBUG(_cond, _fmt, ...) /* no-op */
+#define CTL_ARR_OK(_ap) /* no-op */
 #endif /* #ifdef CTL_DBUG */
 
 /**
@@ -75,307 +58,309 @@ enum {
  * ret:
  *  nothing
  */
-#define PDQ_DEF(_link, _type, _name)                                            \
-                                                                                \
-/**                                                                             \
- * insertion sort:                                                              \
- *                                                                              \
- * args:                                                                        \
- *  @arr: array of _type                                                        \
- *  @len: length of array                                                       \
- *  @cmp: comparison function                                                   \
- *                                                                              \
- * ret:                                                                         \
- *  nothing                                                                     \
- */                                                                             \
-_link void                                                                      \
-_name ## _isort(_type *arr, size_t len, int (*cmp)(const _type, const _type))   \
-{                                                                               \
-        size_t i = 0;                                                           \
-        size_t j = 0;                                                           \
-        _type v;                                                                \
-                                                                                \
-        CTL_ARR_DBUG(arr == NULL, "arr == NULL");                               \
-        CTL_ARR_DBUG(len == 0, "len == 0");                                     \
-        CTL_ARR_DBUG(cmp == NULL, "cmp == NULL");                               \
-                                                                                \
-        for (i = 1; i < len; i++) {                                             \
-                v = arr[i];                                                     \
-                for (j = i; j > 0; j--) {                                       \
-                        if (cmp(arr[j - 1], v) < 0)                             \
-                                break;                                          \
-                        arr[j] = arr[j - 1];                                    \
-                }                                                               \
-                arr[j] = v;                                                     \
-        }                                                                       \
-}                                                                               \
-                                                                                \
-/**                                                                             \
- * heapify array:                                                               \
- *                                                                              \
- * args:                                                                        \
- *  @arr:  array of _type                                                       \
- *  @len:  length of array                                                      \
- *  @cmp:  comparison function                                                  \
- *  @root: root node                                                            \
- */                                                                             \
-_link void                                                                      \
-_name ## _heapify(_type *arr,                                                   \
-                  size_t len,                                                   \
-                  size_t root,                                                  \
-                  int (*cmp)(const _type, const _type))                         \
-{                                                                               \
-        size_t max = 0;                                                         \
-        size_t left = 0;                                                        \
-        size_t right = 0;                                                       \
-        _type tmp;                                                              \
-                                                                                \
-        CTL_ARR_DBUG(arr == NULL, "arr == NULL");                               \
-        CTL_ARR_DBUG(len == 0, "len == 0");                                     \
-        CTL_ARR_DBUG(root >= len, "root >= len");                               \
-        CTL_ARR_DBUG(cmp == NULL, "cmp == NULL");                               \
-                                                                                \
-        for (;;) {                                                              \
-                max = root;                                                     \
-                left = (root * 2) + 1;                                          \
-                right = (root * 2) + 2;                                         \
-                                                                                \
-                if (left < len) {                                               \
-                        if (cmp(arr[left], arr[max]) > 0)                       \
-                                max = left;                                     \
-                }                                                               \
-                                                                                \
-                if (right < len) {                                              \
-                        if (cmp(arr[right], arr[max]) > 0)                      \
-                                max = right;                                    \
-                }                                                               \
-                                                                                \
-                if (max == root)                                                \
-                        break;                                                  \
-                                                                                \
-                tmp = arr[root];                                                \
-                arr[root] = arr[max];                                           \
-                arr[max] = tmp;                                                 \
-                root = max;                                                     \
-        }                                                                       \
-}                                                                               \
-                                                                                \
-/**                                                                             \
- * heapsort:                                                                    \
- *                                                                              \
- * args:                                                                        \
- *  @arr: array of _type                                                        \
- *  @len: length of array                                                       \
- *  @cmp: comparison function                                                   \
- */                                                                             \
-_link void                                                                      \
-_name ## _heapsort(_type *arr,                                                  \
-                  size_t len,                                                   \
-                  int (*cmp)(const _type, const _type))                         \
-{                                                                               \
-        size_t root = 0;                                                        \
-        size_t i = 0;                                                           \
-        _type tmp;                                                              \
-                                                                                \
-        CTL_ARR_DBUG(arr == NULL, "arr == NULL");                               \
-        CTL_ARR_DBUG(len == 0, "len == 0");                                     \
-        CTL_ARR_DBUG(cmp == NULL, "cmp == NULL");                               \
-                                                                                \
-        for (i = len / 2; i > 0; i--)                                           \
-                _name ## _heapify(arr, len, i - 1, cmp);                        \
-                                                                                \
-        root = 0;                                                               \
-        for (i = len; i > 1; i--) {                                             \
-                tmp = arr[root];                                                \
-                arr[root] = arr[i - 1];                                         \
-                arr[i - 1] = tmp;                                               \
-                _name ## _heapify(arr, i - 1, root, cmp);                       \
-        }                                                                       \
-}                                                                               \
-                                                                                \
-/**                                                                             \
- * test if array is sorted:                                                     \
- *                                                                              \
- * args:                                                                        \
- *  @arr: array                                                                 \
- *  @len: array length                                                          \
- *  @cmp: comparison function                                                   \
- *                                                                              \
- * ret:                                                                         \
- *  @true:  if sorted                                                           \
- *  @false: if not                                                              \
- */                                                                             \
-_link bool                                                                      \
-_name ## _is_sorted(_type *arr,                                                 \
-                    size_t len,                                                 \
-                    int (*cmp)(const _type, const _type))                       \
-{                                                                               \
-        size_t i = 0;                                                           \
-                                                                                \
-        CTL_ARR_DBUG(arr == NULL, "arr == NULL");                               \
-        CTL_ARR_DBUG(len == 0, "len == 0");                                     \
-        CTL_ARR_DBUG(cmp == NULL, "cmp == NULL");                               \
-                                                                                \
-        for (i = 1; i < len; i++) {                                             \
-                if (cmp(arr[i], arr[i - 1]) < 0)                                \
-                        return false;                                           \
-        }                                                                       \
-                                                                                \
-        return true;                                                            \
-}                                                                               \
-                                                                                \
-/**                                                                             \
- * get median of three values:                                                  \
- *                                                                              \
- * args:                                                                        \
- *  @a:   pointer to first value                                                \
- *  @b:   pointer to second value                                               \
- *  @c:   pointer to third value                                                \
- *  @cmp: comparison function                                                   \
- *                                                                              \
- * ret:                                                                         \
- *  median of a, b, and c                                                       \
- */                                                                             \
-_link _type                                                                     \
-_name ## _median(_type *a,                                                      \
-                 _type *b,                                                      \
-                 _type *c,                                                      \
-                 int (*cmp)(const _type, const _type))                          \
-{                                                                               \
-        int ab_diff = 0;                                                        \
-        int bc_diff = 0;                                                        \
-        int ac_diff = 0;                                                        \
-                                                                                \
-        CTL_ARR_DBUG(a == NULL, "a == NULL");                                   \
-        CTL_ARR_DBUG(b == NULL, "b == NULL");                                   \
-        CTL_ARR_DBUG(c == NULL, "c == NULL");                                   \
-        CTL_ARR_DBUG(cmp == NULL, "cmp == NULL");                               \
-                                                                                \
-        ab_diff = cmp(*a, *b);                                                  \
-        bc_diff = cmp(*b, *c);                                                  \
-        ac_diff = cmp(*a, *c);                                                  \
-                                                                                \
-        if ((ab_diff > 0) != (ac_diff > 0))                                     \
-                return *a;                                                      \
-        else if ((ab_diff < 0) != (bc_diff > 0))                                \
-                return *b;                                                      \
-        else                                                                    \
-                return *c;                                                      \
-}                                                                               \
-                                                                                \
-/**                                                                             \
- * partition array:                                                             \
- *                                                                              \
- * args:                                                                        \
- *  @arr:   array of _type                                                      \
- *  @len:   length of array                                                     \
- *  @pivot: pivot                                                               \
- *  @cmp:   comparison function                                                 \
- *                                                                              \
- * ret:                                                                         \
- *  pointer to partition point                                                  \
- */                                                                             \
-_link _type *                                                                   \
-_name ## _part(_type *arr,                                                      \
-               size_t len,                                                      \
-               _type pivot,                                                     \
-               int (*cmp)(const _type, const _type))                            \
-{                                                                               \
-        _type *p = NULL;                                                        \
-        _type *end = NULL;                                                      \
-        _type tmp;                                                              \
-                                                                                \
-        CTL_ARR_DBUG(arr == NULL, "arr == NULL");                               \
-        CTL_ARR_DBUG(len == 0, "len == 0");                                     \
-        CTL_ARR_DBUG(cmp == NULL, "cmp == NULL");                               \
-                                                                                \
-        p = arr;                                                                \
-        end = p + len;                                                          \
-        for (;;) {                                                              \
-                while (cmp(*p, pivot) < 0)                                      \
-                        p++;                                                    \
-                                                                                \
-                end--;                                                          \
-                while (cmp(*end, pivot) > 0)                                    \
-                        end--;                                                  \
-                                                                                \
-                if (p >= end)                                                   \
-                        return p;                                               \
-                                                                                \
-                tmp = *p;                                                       \
-                *p = *end;                                                      \
-                *end = tmp;                                                     \
-                p++;                                                            \
-        }                                                                       \
-}                                                                               \
-                                                                                \
-/**                                                                             \
- * do pdqsort:                                                                  \
- *                                                                              \
- * args:                                                                        \
- *  @arr:   array                                                               \
- *  @len:   length of array                                                     \
- *  @depth: recursion depth                                                     \
- *  @cmp:   comparison function                                                 \
- */                                                                             \
-_link void                                                                      \
-_name ## _do_pdq(_type *arr,                                                    \
-                 size_t len,                                                    \
-                 size_t depth,                                                  \
-                 int (*cmp)(const _type, const _type))                          \
-{                                                                               \
-        size_t mid = 0;                                                         \
-        size_t leftlen = 0;                                                     \
-        size_t rightlen = 0;                                                    \
-        _type *p = NULL;                                                        \
-        _type pivot;                                                            \
-                                                                                \
-        CTL_ARR_DBUG(arr == NULL, "arr == NULL");                               \
-        CTL_ARR_DBUG(len == 0, "len == 0");                                     \
-        CTL_ARR_DBUG(cmp == NULL, "cmp == NULL");                               \
-                                                                                \
-        if (len <= PDQ_THRESH) {                                                \
-                _name ## _isort(arr, len, cmp);                                 \
-                return;                                                         \
-        }                                                                       \
-                                                                                \
-        if (depth == 0) {                                                       \
-                _name ## _heapsort(arr, len, cmp);                              \
-                return;                                                         \
-        }                                                                       \
-                                                                                \
-        if (_name ## _is_sorted(arr, len, cmp))                                 \
-                return;                                                         \
-                                                                                \
-        mid = len / 2;                                                          \
-        pivot = _name ## _median(arr, arr + mid, arr + len - 1, cmp);           \
-        p = _name ## _part(arr, len, pivot, cmp);                               \
-                                                                                \
-        leftlen = (size_t)(p - arr);                                            \
-        rightlen = len - leftlen;                                               \
-        _name ## _do_pdq(arr, leftlen, depth - 1, cmp);                         \
-        _name ## _do_pdq(p, rightlen, depth - 1, cmp);                          \
-}                                                                               \
-                                                                                \
-/**                                                                             \
- * pdqsort:                                                                     \
- *                                                                              \
- * args:                                                                        \
- *  @arr:   array                                                               \
- *  @len:   length of array                                                     \
- *  @depth: recursion depth                                                     \
- *  @cmp:   comparison function                                                 \
- */                                                                             \
-_link void                                                                      \
-_name ## _pdq(_type *arr,                                                       \
-             size_t len,                                                        \
-             int (*cmp)(const _type, const _type))                              \
-{                                                                               \
-        CTL_ARR_DBUG(arr == NULL, "arr == NULL");                               \
-        CTL_ARR_DBUG(len == 0, "len == 0");                                     \
-        CTL_ARR_DBUG(cmp == NULL, "cmp == NULL");                               \
-                                                                                \
-        _name ## _do_pdq(arr, len, PDQ_RECUR, cmp);                             \
+#define PDQ_DEF(_link, _type, _name)                                    \
+                                                                        \
+/**                                                                     \
+ * insertion sort:                                                      \
+ *                                                                      \
+ * args:                                                                \
+ *  @arr: array of _type                                                \
+ *  @len: length of array                                               \
+ *  @cmp: comparison function                                           \
+ *                                                                      \
+ * ret:                                                                 \
+ *  nothing                                                             \
+ */                                                                     \
+_link void                                                              \
+_name ## _isort(_type *arr,                                             \
+                size_t len,                                             \
+                int (*cmp)(const _type, const _type))                   \
+{                                                                       \
+        size_t i = 0;                                                   \
+        size_t j = 0;                                                   \
+        _type v;                                                        \
+                                                                        \
+        dbug(arr == NULL, "arr == NULL");                               \
+        dbug(len == 0, "len == 0");                                     \
+        dbug(cmp == NULL, "cmp == NULL");                               \
+                                                                        \
+        for (i = 1; i < len; i++) {                                     \
+                v = arr[i];                                             \
+                for (j = i; j > 0; j--) {                               \
+                        if (cmp(arr[j - 1], v) < 0)                     \
+                                break;                                  \
+                        arr[j] = arr[j - 1];                            \
+                }                                                       \
+                arr[j] = v;                                             \
+        }                                                               \
+}                                                                       \
+                                                                        \
+/**                                                                     \
+ * heapify array:                                                       \
+ *                                                                      \
+ * args:                                                                \
+ *  @arr:  array of _type                                               \
+ *  @len:  length of array                                              \
+ *  @cmp:  comparison function                                          \
+ *  @root: root node                                                    \
+ */                                                                     \
+_link void                                                              \
+_name ## _heapify(_type *arr,                                           \
+                  size_t len,                                           \
+                  size_t root,                                          \
+                  int (*cmp)(const _type, const _type))                 \
+{                                                                       \
+        size_t max = 0;                                                 \
+        size_t left = 0;                                                \
+        size_t right = 0;                                               \
+        _type tmp;                                                      \
+                                                                        \
+        dbug(arr == NULL, "arr == NULL");                               \
+        dbug(len == 0, "len == 0");                                     \
+        dbug(root >= len, "root >= len");                               \
+        dbug(cmp == NULL, "cmp == NULL");                               \
+                                                                        \
+        for (;;) {                                                      \
+                max = root;                                             \
+                left = (root * 2) + 1;                                  \
+                right = (root * 2) + 2;                                 \
+                                                                        \
+                if (left < len) {                                       \
+                        if (cmp(arr[left], arr[max]) > 0)               \
+                                max = left;                             \
+                }                                                       \
+                                                                        \
+                if (right < len) {                                      \
+                        if (cmp(arr[right], arr[max]) > 0)              \
+                                max = right;                            \
+                }                                                       \
+                                                                        \
+                if (max == root)                                        \
+                        break;                                          \
+                                                                        \
+                tmp = arr[root];                                        \
+                arr[root] = arr[max];                                   \
+                arr[max] = tmp;                                         \
+                root = max;                                             \
+        }                                                               \
+}                                                                       \
+                                                                        \
+/**                                                                     \
+ * heapsort:                                                            \
+ *                                                                      \
+ * args:                                                                \
+ *  @arr: array of _type                                                \
+ *  @len: length of array                                               \
+ *  @cmp: comparison function                                           \
+ */                                                                     \
+_link void                                                              \
+_name ## _heapsort(_type *arr,                                          \
+                  size_t len,                                           \
+                  int (*cmp)(const _type, const _type))                 \
+{                                                                       \
+        size_t root = 0;                                                \
+        size_t i = 0;                                                   \
+        _type tmp;                                                      \
+                                                                        \
+        dbug(arr == NULL, "arr == NULL");                               \
+        dbug(len == 0, "len == 0");                                     \
+        dbug(cmp == NULL, "cmp == NULL");                               \
+                                                                        \
+        for (i = len / 2; i > 0; i--)                                   \
+                _name ## _heapify(arr, len, i - 1, cmp);                \
+                                                                        \
+        root = 0;                                                       \
+        for (i = len; i > 1; i--) {                                     \
+                tmp = arr[root];                                        \
+                arr[root] = arr[i - 1];                                 \
+                arr[i - 1] = tmp;                                       \
+                _name ## _heapify(arr, i - 1, root, cmp);               \
+        }                                                               \
+}                                                                       \
+                                                                        \
+/**                                                                     \
+ * test if array is sorted:                                             \
+ *                                                                      \
+ * args:                                                                \
+ *  @arr: array                                                         \
+ *  @len: array length                                                  \
+ *  @cmp: comparison function                                           \
+ *                                                                      \
+ * ret:                                                                 \
+ *  @true:  if sorted                                                   \
+ *  @false: if not                                                      \
+ */                                                                     \
+_link bool                                                              \
+_name ## _is_sorted(_type *arr,                                         \
+                    size_t len,                                         \
+                    int (*cmp)(const _type, const _type))               \
+{                                                                       \
+        size_t i = 0;                                                   \
+                                                                        \
+        dbug(arr == NULL, "arr == NULL");                               \
+        dbug(len == 0, "len == 0");                                     \
+        dbug(cmp == NULL, "cmp == NULL");                               \
+                                                                        \
+        for (i = 1; i < len; i++) {                                     \
+                if (cmp(arr[i], arr[i - 1]) < 0)                        \
+                        return false;                                   \
+        }                                                               \
+                                                                        \
+        return true;                                                    \
+}                                                                       \
+                                                                        \
+/**                                                                     \
+ * get median of three values:                                          \
+ *                                                                      \
+ * args:                                                                \
+ *  @a:   pointer to first value                                        \
+ *  @b:   pointer to second value                                       \
+ *  @c:   pointer to third value                                        \
+ *  @cmp: comparison function                                           \
+ *                                                                      \
+ * ret:                                                                 \
+ *  median of a, b, and c                                               \
+ */                                                                     \
+_link _type                                                             \
+_name ## _median(_type *a,                                              \
+                 _type *b,                                              \
+                 _type *c,                                              \
+                 int (*cmp)(const _type, const _type))                  \
+{                                                                       \
+        int ab_diff = 0;                                                \
+        int bc_diff = 0;                                                \
+        int ac_diff = 0;                                                \
+                                                                        \
+        dbug(a == NULL, "a == NULL");                                   \
+        dbug(b == NULL, "b == NULL");                                   \
+        dbug(c == NULL, "c == NULL");                                   \
+        dbug(cmp == NULL, "cmp == NULL");                               \
+                                                                        \
+        ab_diff = cmp(*a, *b);                                          \
+        bc_diff = cmp(*b, *c);                                          \
+        ac_diff = cmp(*a, *c);                                          \
+                                                                        \
+        if ((ab_diff > 0) != (ac_diff > 0))                             \
+                return *a;                                              \
+        else if ((ab_diff < 0) != (bc_diff > 0))                        \
+                return *b;                                              \
+        else                                                            \
+                return *c;                                              \
+}                                                                       \
+                                                                        \
+/**                                                                     \
+ * partition array:                                                     \
+ *                                                                      \
+ * args:                                                                \
+ *  @arr:   array of _type                                              \
+ *  @len:   length of array                                             \
+ *  @pivot: pivot                                                       \
+ *  @cmp:   comparison function                                         \
+ *                                                                      \
+ * ret:                                                                 \
+ *  pointer to partition point                                          \
+ */                                                                     \
+_link _type *                                                           \
+_name ## _part(_type *arr,                                              \
+               size_t len,                                              \
+               _type pivot,                                             \
+               int (*cmp)(const _type, const _type))                    \
+{                                                                       \
+        _type *p = NULL;                                                \
+        _type *end = NULL;                                              \
+        _type tmp;                                                      \
+                                                                        \
+        dbug(arr == NULL, "arr == NULL");                               \
+        dbug(len == 0, "len == 0");                                     \
+        dbug(cmp == NULL, "cmp == NULL");                               \
+                                                                        \
+        p = arr;                                                        \
+        end = p + len;                                                  \
+        for (;;) {                                                      \
+                while (cmp(*p, pivot) < 0)                              \
+                        p++;                                            \
+                                                                        \
+                end--;                                                  \
+                while (cmp(*end, pivot) > 0)                            \
+                        end--;                                          \
+                                                                        \
+                if (p >= end)                                           \
+                        return p;                                       \
+                                                                        \
+                tmp = *p;                                               \
+                *p = *end;                                              \
+                *end = tmp;                                             \
+                p++;                                                    \
+        }                                                               \
+}                                                                       \
+                                                                        \
+/**                                                                     \
+ * do pdqsort:                                                          \
+ *                                                                      \
+ * args:                                                                \
+ *  @arr:   array                                                       \
+ *  @len:   length of array                                             \
+ *  @depth: recursion depth                                             \
+ *  @cmp:   comparison function                                         \
+ */                                                                     \
+_link void                                                              \
+_name ## _do_pdq(_type *arr,                                            \
+                 size_t len,                                            \
+                 size_t depth,                                          \
+                 int (*cmp)(const _type, const _type))                  \
+{                                                                       \
+        size_t mid = 0;                                                 \
+        size_t leftlen = 0;                                             \
+        size_t rightlen = 0;                                            \
+        _type *p = NULL;                                                \
+        _type pivot;                                                    \
+                                                                        \
+        dbug(arr == NULL, "arr == NULL");                               \
+        dbug(len == 0, "len == 0");                                     \
+        dbug(cmp == NULL, "cmp == NULL");                               \
+                                                                        \
+        if (len <= PDQ_THRESH) {                                        \
+                _name ## _isort(arr, len, cmp);                         \
+                return;                                                 \
+        }                                                               \
+                                                                        \
+        if (depth == 0) {                                               \
+                _name ## _heapsort(arr, len, cmp);                      \
+                return;                                                 \
+        }                                                               \
+                                                                        \
+        if (_name ## _is_sorted(arr, len, cmp))                         \
+                return;                                                 \
+                                                                        \
+        mid = len / 2;                                                  \
+        pivot = _name ## _median(arr, arr + mid, arr + len - 1, cmp);   \
+        p = _name ## _part(arr, len, pivot, cmp);                       \
+                                                                        \
+        leftlen = (size_t)(p - arr);                                    \
+        rightlen = len - leftlen;                                       \
+        _name ## _do_pdq(arr, leftlen, depth - 1, cmp);                 \
+        _name ## _do_pdq(p, rightlen, depth - 1, cmp);                  \
+}                                                                       \
+                                                                        \
+/**                                                                     \
+ * pdqsort:                                                             \
+ *                                                                      \
+ * args:                                                                \
+ *  @arr:   array                                                       \
+ *  @len:   length of array                                             \
+ *  @depth: recursion depth                                             \
+ *  @cmp:   comparison function                                         \
+ */                                                                     \
+_link void                                                              \
+_name ## _pdq(_type *arr,                                               \
+             size_t len,                                                \
+             int (*cmp)(const _type, const _type))                      \
+{                                                                       \
+        dbug(arr == NULL, "arr == NULL");                               \
+        dbug(len == 0, "len == 0");                                     \
+        dbug(cmp == NULL, "cmp == NULL");                               \
+                                                                        \
+        _name ## _do_pdq(arr, len, PDQ_RECUR, cmp);                     \
 }
 
 /**
@@ -408,7 +393,7 @@ struct _name {                                                  \
 PUBLIC _link int                                                \
 _name ## _init(struct _name *ap, size_t cap)                    \
 {                                                               \
-        CTL_ARR_DBUG(ap == NULL, "ap == NULL");                 \
+        dbug(ap == NULL, "ap == NULL");                         \
                                                                 \
         if (cap == 0)                                           \
                 cap = CTL_ARR_INIT_CAP;                         \
@@ -634,7 +619,7 @@ _name ## _shrink_by(struct _name *ap, size_t amt)               \
         _type *p = NULL;                                        \
                                                                 \
         CTL_ARR_OK(ap);                                         \
-        CTL_ARR_DBUG(amt > ap->len, "amt > ap->len");           \
+        dbug(amt > ap->len, "amt > ap->len");                   \
                                                                 \
         /* shrink by amount */                                  \
         cap = ap->cap - amt;                                    \
@@ -665,7 +650,7 @@ _name ## _shrink_by_if_needed(struct _name *ap, size_t amt)     \
         size_t newlen = 0;                                      \
                                                                 \
         CTL_ARR_OK(ap);                                         \
-        CTL_ARR_DBUG(amt > ap->len, "amt > ap->len");           \
+        dbug(amt > ap->len, "amt > ap->len");                   \
                                                                 \
         newlen = ap->len - amt;                                 \
         if (newlen > (ap->cap / 2))                             \
@@ -694,7 +679,7 @@ _name ## _sort(struct _name *ap,                                \
                int (*fn)(const _type, const _type))             \
 {                                                               \
         CTL_ARR_OK(ap);                                         \
-        CTL_ARR_DBUG(fn == NULL, "fn == NULL");                 \
+        dbug(fn == NULL, "fn == NULL");                         \
         _name ## _pdq(ap->arr, ap->len, fn);                    \
 }                                                               \
                                                                 \
@@ -722,9 +707,9 @@ _name ## _addv(struct _name *ap,                                \
         _type *dst = NULL;                                      \
                                                                 \
         CTL_ARR_OK(ap);                                         \
-        CTL_ARR_DBUG(idx >= ap->cap, "idx >= cap");             \
-        CTL_ARR_DBUG(len == 0, "len == 0");                     \
-        CTL_ARR_DBUG(arr == NULL, "arr == NULL");               \
+        dbug(idx >= ap->cap, "idx >= cap");                     \
+        dbug(len == 0, "len == 0");                             \
+        dbug(arr == NULL, "arr == NULL");                       \
                                                                 \
         if (_name ## _grow_by_if_needed(ap, len) < 0)           \
                 return -1;                                      \
@@ -770,9 +755,9 @@ _name ## _rmv(struct _name *ap,                                 \
         _type *dst = NULL;                                      \
                                                                 \
         CTL_ARR_OK(ap);                                         \
-        CTL_ARR_DBUG(idx >= ap->len, "idx >= len");             \
-        CTL_ARR_DBUG(len == 0, "len == 0");                     \
-        CTL_ARR_DBUG(len > ap->len - idx,                       \
+        dbug(idx >= ap->len, "idx >= len");                     \
+        dbug(len == 0, "len == 0");                             \
+        dbug(len > ap->len - idx,                               \
                      "len > ap->len - idx");                    \
                                                                 \
         if (_name ## _shrink_by_if_needed(ap, len) < 0)         \
@@ -865,7 +850,7 @@ _name ## _find(const struct _name *ap,                          \
         size_t i = 0;                                           \
                                                                 \
         CTL_ARR_OK(ap);                                         \
-        CTL_ARR_DBUG(cmp == NULL, "cmp == NULL");               \
+        dbug(cmp == NULL, "cmp == NULL");                       \
                                                                 \
         for (i = 0; i < ap->len; i++) {                         \
                 if (cmp(ap->arr[i], v) == 0)                    \
@@ -905,7 +890,7 @@ _name ## _bin_add(struct _name *ap,                             \
         int diff = 0;                                           \
                                                                 \
         CTL_ARR_OK(ap);                                         \
-        CTL_ARR_DBUG(cmp == NULL, "cmp == NULL");               \
+        dbug(cmp == NULL, "cmp == NULL");                       \
                                                                 \
         if (_name ## _grow_if_needed(ap) < 0)                   \
                 return -1;                                      \
@@ -973,7 +958,7 @@ _name ## _bin_find(const struct _name *ap,                      \
         int diff = 0;                                           \
                                                                 \
         CTL_ARR_OK(ap);                                         \
-        CTL_ARR_DBUG(cmp == NULL, "cmp == NULL");               \
+        dbug(cmp == NULL, "cmp == NULL");                       \
                                                                 \
         low = 0;                                                \
         high = ap->len;                                         \
@@ -1017,7 +1002,7 @@ _name ## _bin_rm(struct _name *ap,                              \
         size_t i = 0;                                           \
                                                                 \
         CTL_ARR_OK(ap);                                         \
-        CTL_ARR_DBUG(cmp == NULL, "cmp == NULL");               \
+        dbug(cmp == NULL, "cmp == NULL");                       \
                                                                 \
         i = _name ## _bin_find(ap, v, cmp);                     \
         if (i == ap->len)                                       \

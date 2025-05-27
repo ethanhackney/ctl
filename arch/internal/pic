@@ -1,6 +1,7 @@
 AUTO-GENERATED! DO NOT MODIFY
 
 /home/ethanhackney/code/ctl
+├── a.out
 ├── arch
 │   ├── internal
 │   │   ├── env
@@ -52,4 +53,4 @@ AUTO-GENERATED! DO NOT MODIFY
 │           └── slist.h
 └── TODO
 
-23 directories, 27 files
+23 directories, 28 files
