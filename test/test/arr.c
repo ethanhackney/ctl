@@ -1,7 +1,3 @@
-#ifndef CTL_DBUG
-#define CTL_DBUG
-#endif /* #ifndef CTL_DBUG */
-
 /**
  * define a new array test:
  *
@@ -40,7 +36,7 @@ _name ## _do_test(_type *data,                                                  
         _type v;                                                                \
         int ret = 0;                                                            \
                                                                                 \
-        if (_name ## _init(&arr, 0) < 0)                                        \
+        if (_name ## _init(NULL, 0) < 0)                                        \
                 die("%s_init", TO_STR(_name));                                  \
                                                                                 \
         if (_name ## _addv(&arr, 0, data, n) < 0)                               \

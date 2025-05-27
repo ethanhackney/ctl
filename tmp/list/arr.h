@@ -181,7 +181,6 @@ _name ## _heapsort(_type *arr,                                                  
         CTL_ARR_DBUG(len == 0, "len == 0");                                     \
         CTL_ARR_DBUG(cmp == NULL, "cmp == NULL");                               \
                                                                                 \
-                                                                                \
         for (i = len / 2; i > 0; i--)                                           \
                 _name ## _heapify(arr, len, i - 1, cmp);                        \
                                                                                 \
