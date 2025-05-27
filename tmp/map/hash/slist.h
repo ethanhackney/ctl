@@ -56,8 +56,8 @@
         dbug(_cond, _fmt, ##__VA_ARGS__)
 
 #else
-#define CTL_HASH_SLIST_OK(_name, _hsp)   /* no-op */
-#define CTL_HASH_SLIST_DBUG(_name, _hsp) /* no-op */
+#define CTL_HASH_SLIST_OK(_name, _hsp)        /* no-op */
+#define CTL_HASH_SLIST_DBUG(_cond, _fmt, ...) /* no-op */
 #endif /* #ifdef CTL_DBUG */
 
 /**
