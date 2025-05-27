@@ -39,6 +39,22 @@
         }                                                               \
         dbug(_len != (_hsp)->len, "hsp->len != len");                   \
 } while (0)
+
+/**
+ * do dbug:
+ *
+ * args:
+ *  @_cond: condition
+ *  @_fmt:  format string
+ *  @...:   arguments
+ *
+ * ret:
+ *  @success: nothing
+ *  @failure: exit process
+ */
+#define CTL_HASH_SLIST_DBUG(_cond, _fmt, ...) \
+        dbug(_cond, _fmt, ##__VA_ARGS__)
+
 #else
 #define CTL_HASH_SLIST_OK(_name, _hsp) /* no-op */
 #endif /* #ifdef CTL_DBUG */
@@ -222,8 +238,8 @@ _name ## _init(struct _name *hsp,                                       \
                           const _ktype b,                               \
                           size_t blen))                                 \
 {                                                                       \
-        dbug(hsp == NULL, "hsp == NULL");                               \
-        dbug(cmp == NULL, "cmp == NULL");                               \
+        CTL_HASH_SLIST_DBUG(hsp == NULL, "hsp == NULL");                \
+        CTL_HASH_SLIST_DBUG(cmp == NULL, "cmp == NULL");                \
                                                                         \
         if (seed == 0)                                                  \
                 seed = (ctl_hash_size_t)time(NULL);                     \

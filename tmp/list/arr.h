@@ -28,8 +28,25 @@
         dbug((_ap)->cap < CTL_ARR_INIT_CAP, "ap->cap < CTL_ARR_INIT_CAP0");     \
         dbug((_ap)->len > (_ap)->cap, "ap->len > ap->cap");                     \
 } while (0)
+
+/**
+ * do dbug:
+ *
+ * args:
+ *  @_cond: condition
+ *  @_fmt:  format string
+ *  @...:   arguments
+ *
+ * ret:
+ *  @success: nothing
+ *  @failure: exit process
+ */
+#define CTL_ARR_DBUG(_cond, _fmt, ...) \
+        dbug(_cond, _fmt, ##__VA_ARGS__)
+
 #else
-#define CTL_ARR_OK(_ap) /* no-op */
+#define CTL_ARR_OK(_ap)                /* no-op */
+#define CTL_ARR_DBUG(_cond, _fmt, ...) /* no-op */
 #endif /* #ifdef CTL_DBUG */
 
 /**
@@ -42,9 +59,10 @@
 #define CTL_ARR_FOR_EACH(_ap, _p) \
         for (_p = (_ap)->arr; _p != (_ap)->arr + (_ap)->len; _p++)
 
-#define PDQ_THRESH 24       /* pdqsort threshold */
-#define PDQ_RECUR  (1 << 7) /* pdqsort recursion limit */
-
+enum {
+        PDQ_THRESH = 24,       /* pdqsort threshold */
+        PDQ_RECUR  = (1 << 7), /* pdqsort recursion limit */
+};
 /**
  * generate a pdqsort:
  *
@@ -77,9 +95,9 @@ _name ## _isort(_type *arr, size_t len, int (*cmp)(const _type, const _type))   
         size_t j = 0;                                                           \
         _type v;                                                                \
                                                                                 \
-        dbug(arr == NULL, "arr == NULL");                                       \
-        dbug(len == 0, "len == 0");                                             \
-        dbug(cmp == NULL, "cmp == NULL");                                       \
+        CTL_ARR_DBUG(arr == NULL, "arr == NULL");                               \
+        CTL_ARR_DBUG(len == 0, "len == 0");                                     \
+        CTL_ARR_DBUG(cmp == NULL, "cmp == NULL");                               \
                                                                                 \
         for (i = 1; i < len; i++) {                                             \
                 v = arr[i];                                                     \
@@ -112,11 +130,10 @@ _name ## _heapify(_type *arr,                                                   
         size_t right = 0;                                                       \
         _type tmp;                                                              \
                                                                                 \
-        dbug(arr == NULL, "arr == NULL");                                       \
-        dbug(len == 0, "len == 0");                                             \
-        dbug(root >= len, "root >= len");                                       \
-        dbug(cmp == NULL, "cmp == NULL");                                       \
-                                                                                \
+        CTL_ARR_DBUG(arr == NULL, "arr == NULL");                               \
+        CTL_ARR_DBUG(len == 0, "len == 0");                                     \
+        CTL_ARR_DBUG(root >= len, "root >= len");                               \
+        CTL_ARR_DBUG(cmp == NULL, "cmp == NULL");                               \
                                                                                 \
         for (;;) {                                                              \
                 max = root;                                                     \
@@ -160,9 +177,9 @@ _name ## _heapsort(_type *arr,                                                  
         size_t i = 0;                                                           \
         _type tmp;                                                              \
                                                                                 \
-        dbug(arr == NULL, "arr == NULL");                                       \
-        dbug(len == 0, "len == 0");                                             \
-        dbug(cmp == NULL, "cmp == NULL");                                       \
+        CTL_ARR_DBUG(arr == NULL, "arr == NULL");                               \
+        CTL_ARR_DBUG(len == 0, "len == 0");                                     \
+        CTL_ARR_DBUG(cmp == NULL, "cmp == NULL");                               \
                                                                                 \
                                                                                 \
         for (i = len / 2; i > 0; i--)                                           \
@@ -196,9 +213,9 @@ _name ## _is_sorted(_type *arr,                                                 
 {                                                                               \
         size_t i = 0;                                                           \
                                                                                 \
-        dbug(arr == NULL, "arr == NULL");                                       \
-        dbug(len == 0, "len == 0");                                             \
-        dbug(cmp == NULL, "cmp == NULL");                                       \
+        CTL_ARR_DBUG(arr == NULL, "arr == NULL");                               \
+        CTL_ARR_DBUG(len == 0, "len == 0");                                     \
+        CTL_ARR_DBUG(cmp == NULL, "cmp == NULL");                               \
                                                                                 \
         for (i = 1; i < len; i++) {                                             \
                 if (cmp(arr[i], arr[i - 1]) < 0)                                \
@@ -230,10 +247,10 @@ _name ## _median(_type *a,                                                      
         int bc_diff = 0;                                                        \
         int ac_diff = 0;                                                        \
                                                                                 \
-        dbug(a == NULL, "a == NULL");                                           \
-        dbug(b == NULL, "b == NULL");                                           \
-        dbug(c == NULL, "c == NULL");                                           \
-        dbug(cmp == NULL, "cmp == NULL");                                       \
+        CTL_ARR_DBUG(a == NULL, "a == NULL");                                   \
+        CTL_ARR_DBUG(b == NULL, "b == NULL");                                   \
+        CTL_ARR_DBUG(c == NULL, "c == NULL");                                   \
+        CTL_ARR_DBUG(cmp == NULL, "cmp == NULL");                               \
                                                                                 \
         ab_diff = cmp(*a, *b);                                                  \
         bc_diff = cmp(*b, *c);                                                  \
@@ -269,9 +286,9 @@ _name ## _part(_type *arr,                                                      
         _type *end = NULL;                                                      \
         _type tmp;                                                              \
                                                                                 \
-        dbug(arr == NULL, "arr == NULL");                                       \
-        dbug(len == 0, "len == 0");                                             \
-        dbug(cmp == NULL, "cmp == NULL");                                       \
+        CTL_ARR_DBUG(arr == NULL, "arr == NULL");                               \
+        CTL_ARR_DBUG(len == 0, "len == 0");                                     \
+        CTL_ARR_DBUG(cmp == NULL, "cmp == NULL");                               \
                                                                                 \
         p = arr;                                                                \
         end = p + len;                                                          \
@@ -314,9 +331,9 @@ _name ## _do_pdq(_type *arr,                                                    
         _type *p = NULL;                                                        \
         _type pivot;                                                            \
                                                                                 \
-        dbug(arr == NULL, "arr == NULL");                                       \
-        dbug(len == 0, "len == 0");                                             \
-        dbug(cmp == NULL, "cmp == NULL");                                       \
+        CTL_ARR_DBUG(arr == NULL, "arr == NULL");                               \
+        CTL_ARR_DBUG(len == 0, "len == 0");                                     \
+        CTL_ARR_DBUG(cmp == NULL, "cmp == NULL");                               \
                                                                                 \
         if (len <= PDQ_THRESH) {                                                \
                 _name ## _isort(arr, len, cmp);                                 \
@@ -355,9 +372,9 @@ _name ## _pdq(_type *arr,                                                       
              size_t len,                                                        \
              int (*cmp)(const _type, const _type))                              \
 {                                                                               \
-        dbug(arr == NULL, "arr == NULL");                                       \
-        dbug(len == 0, "len == 0");                                             \
-        dbug(cmp == NULL, "cmp == NULL");                                       \
+        CTL_ARR_DBUG(arr == NULL, "arr == NULL");                               \
+        CTL_ARR_DBUG(len == 0, "len == 0");                                     \
+        CTL_ARR_DBUG(cmp == NULL, "cmp == NULL");                               \
                                                                                 \
         _name ## _do_pdq(arr, len, PDQ_RECUR, cmp);                             \
 }
@@ -392,7 +409,7 @@ struct _name {                                                  \
 PUBLIC _link int                                                \
 _name ## _init(struct _name *ap, size_t cap)                    \
 {                                                               \
-        dbug(ap == NULL, "ap == NULL");                         \
+        CTL_ARR_DBUG(ap == NULL, "ap == NULL");                 \
                                                                 \
         if (cap == 0)                                           \
                 cap = CTL_ARR_INIT_CAP;                         \
@@ -618,7 +635,7 @@ _name ## _shrink_by(struct _name *ap, size_t amt)               \
         _type *p = NULL;                                        \
                                                                 \
         CTL_ARR_OK(ap);                                         \
-        dbug(amt > ap->len, "amt > ap->len");                   \
+        CTL_ARR_DBUG(amt > ap->len, "amt > ap->len");           \
                                                                 \
         /* shrink by amount */                                  \
         cap = ap->cap - amt;                                    \
@@ -649,7 +666,7 @@ _name ## _shrink_by_if_needed(struct _name *ap, size_t amt)     \
         size_t newlen = 0;                                      \
                                                                 \
         CTL_ARR_OK(ap);                                         \
-        dbug(amt > ap->len, "amt > ap->len");                   \
+        CTL_ARR_DBUG(amt > ap->len, "amt > ap->len");           \
                                                                 \
         newlen = ap->len - amt;                                 \
         if (newlen > (ap->cap / 2))                             \
@@ -678,7 +695,7 @@ _name ## _sort(struct _name *ap,                                \
                int (*fn)(const _type, const _type))             \
 {                                                               \
         CTL_ARR_OK(ap);                                         \
-        dbug(fn == NULL, "fn == NULL");                         \
+        CTL_ARR_DBUG(fn == NULL, "fn == NULL");                 \
         _name ## _pdq(ap->arr, ap->len, fn);                    \
 }                                                               \
                                                                 \
@@ -706,9 +723,9 @@ _name ## _addv(struct _name *ap,                                \
         _type *dst = NULL;                                      \
                                                                 \
         CTL_ARR_OK(ap);                                         \
-        dbug(idx >= ap->cap, "idx >= cap");                     \
-        dbug(len == 0, "len == 0");                             \
-        dbug(arr == NULL, "arr == NULL");                       \
+        CTL_ARR_DBUG(idx >= ap->cap, "idx >= cap");             \
+        CTL_ARR_DBUG(len == 0, "len == 0");                     \
+        CTL_ARR_DBUG(arr == NULL, "arr == NULL");               \
                                                                 \
         if (_name ## _grow_by_if_needed(ap, len) < 0)           \
                 return -1;                                      \
@@ -754,9 +771,10 @@ _name ## _rmv(struct _name *ap,                                 \
         _type *dst = NULL;                                      \
                                                                 \
         CTL_ARR_OK(ap);                                         \
-        dbug(idx >= ap->len, "idx >= len");                     \
-        dbug(len == 0, "len == 0");                             \
-        dbug(len > ap->len - idx, "len > ap->len - idx");       \
+        CTL_ARR_DBUG(idx >= ap->len, "idx >= len");             \
+        CTL_ARR_DBUG(len == 0, "len == 0");                     \
+        CTL_ARR_DBUG(len > ap->len - idx,                       \
+                     "len > ap->len - idx");                    \
                                                                 \
         if (_name ## _shrink_by_if_needed(ap, len) < 0)         \
                 return -1;                                      \
@@ -848,7 +866,7 @@ _name ## _find(const struct _name *ap,                          \
         size_t i = 0;                                           \
                                                                 \
         CTL_ARR_OK(ap);                                         \
-        dbug(cmp == NULL, "cmp == NULL");                       \
+        CTL_ARR_DBUG(cmp == NULL, "cmp == NULL");               \
                                                                 \
         for (i = 0; i < ap->len; i++) {                         \
                 if (cmp(ap->arr[i], v) == 0)                    \
@@ -888,7 +906,7 @@ _name ## _bin_add(struct _name *ap,                             \
         int diff = 0;                                           \
                                                                 \
         CTL_ARR_OK(ap);                                         \
-        dbug(cmp == NULL, "cmp == NULL");                       \
+        CTL_ARR_DBUG(cmp == NULL, "cmp == NULL");               \
                                                                 \
         if (_name ## _grow_if_needed(ap) < 0)                   \
                 return -1;                                      \
@@ -956,7 +974,7 @@ _name ## _bin_find(const struct _name *ap,                      \
         int diff = 0;                                           \
                                                                 \
         CTL_ARR_OK(ap);                                         \
-        dbug(cmp == NULL, "cmp == NULL");                       \
+        CTL_ARR_DBUG(cmp == NULL, "cmp == NULL");               \
                                                                 \
         low = 0;                                                \
         high = ap->len;                                         \
@@ -1000,7 +1018,7 @@ _name ## _bin_rm(struct _name *ap,                              \
         size_t i = 0;                                           \
                                                                 \
         CTL_ARR_OK(ap);                                         \
-        dbug(cmp == NULL, "cmp == NULL");                       \
+        CTL_ARR_DBUG(cmp == NULL, "cmp == NULL");               \
                                                                 \
         i = _name ## _bin_find(ap, v, cmp);                     \
         if (i == ap->len)                                       \
