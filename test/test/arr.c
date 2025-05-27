@@ -1,6 +1,6 @@
-#ifndef DBUG /* #ifndef DBUG */
-#define DBUG
-#endif /* #ifndef DBUG */
+#ifndef CTL_DBUG
+#define CTL_DBUG
+#endif /* #ifndef CTL_DBUG */
 
 /**
  * define a new array test:

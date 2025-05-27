@@ -11,7 +11,7 @@
 #endif /* #ifndef ARR_INIT_CAP */
 
 /* if debugging */
-#ifdef DBUG
+#ifdef CTL_DBUG
 /**
  * test if state of array is valid:
  *
@@ -30,7 +30,7 @@
 } while (0)
 #else
 #define CTL_ARR_OK(_ap) /* no-op */
-#endif /* #ifdef DBUG */
+#endif /* #ifdef CTL_DBUG */
 
 /**
  * iterate through array:

@@ -126,7 +126,7 @@ void do_die(const char *file, const char *func, int line, const char *fmt, ...);
         do_die(__FILE__, __func__, __LINE__, _fmt, ##__VA_ARGS__)
 
 /* if debugging */
-#ifdef DBUG
+#ifdef CTL_DBUG
 /**
  * test condition and if true, print message and exit:
  *
@@ -169,7 +169,7 @@ do_dbug(bool cond,
         const char *fmt, ...)
 {
 }
-#endif /* #ifdef DBUG */
+#endif /* #ifdef CTL_DBUG */
 
 /**
  * test condition and if true, print message and exit:

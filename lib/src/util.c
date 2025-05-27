@@ -25,7 +25,9 @@ buf_rand(void *buf, size_t sz)
         uint8_t *bufp = NULL;
         uint8_t *endp = NULL;
 
+#ifdef CTL_DBUG
         dbug(buf == NULL, "buf == NULL");
+#endif /* #ifdef CTL_DBUG */
 
         endp = ((uint8_t *)buf) + sz;
         for (bufp = buf; bufp < endp; bufp++)

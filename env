@@ -35,9 +35,9 @@ export CTL_CFLAGS='-Wall  \
 -Wno-unused-parameter     \
 -pedantic'
 
-export CTL_FAST_CFLAGS="$CTL_CFLAGS -O3"              # enable optimizations
-export CTL_DBUG='-DDBUG -fsanitize=address,undefined' # debugging flags
-export CTL_TEST_CFLAGS="$CTL_CFLAGS $CTL_DBUG"        # compiler flags for tests
+export CTL_FAST_CFLAGS="$CTL_CFLAGS -O3"                  # enable optimizations
+export CTL_DBUG='-DCTL_DBUG -fsanitize=address,undefined' # debugging flags
+export CTL_TEST_CFLAGS="$CTL_CFLAGS $CTL_DBUG"            # compiler flags for tests
 
 # bash libraries
 export CTL_BASH_LIB="$CTL_ROOT/bash/lib" # bash library

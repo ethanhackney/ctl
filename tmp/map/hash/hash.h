@@ -146,9 +146,11 @@ ctl_hash(const void *key, ctl_hash_size_t len, ctl_hash_size_t seed)
         const uint8_t *blocks = NULL;
         const uint8_t *tail = NULL;
 
+#ifdef CTL_DBUG
         dbug(key == NULL, "key == NULL");
         dbug(len == 0, "len == 0");
         dbug(seed == 0, "seed == 0");
+#endif /* #ifdef CTL_DBUG */
 
         h0 = seed;
         h1 = seed;
@@ -236,9 +238,11 @@ ctl_hash(const void *key, ctl_hash_size_t len, ctl_hash_size_t seed)
         c0 = 0xcc9e2d51;
         c1 = 0x1b873593;
 
+#ifdef CTL_DBUG
         dbug(key == NULL, "key == NULL");
         dbug(len == 0, "len == 0");
         dbug(seed == 0, "seed == 0");
+#endif /* #ifdef CTL_DBUG */
 
         h = seed;
         kp = (const uint8_t *)key;

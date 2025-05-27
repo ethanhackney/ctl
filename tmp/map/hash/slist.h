@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 /* if debugging */
-#ifdef DBUG
+#ifdef CTL_DBUG
 /**
  * test if state of hash map is valid:
  *
@@ -41,7 +41,7 @@
 } while (0)
 #else
 #define CTL_HASH_SLIST_OK(_name, _hsp) /* no-op */
-#endif /* #ifdef DBUG */
+#endif /* #ifdef CTL_DBUG */
 
 /**
  * iterate through hash map safely:
