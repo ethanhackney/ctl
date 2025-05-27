@@ -45,11 +45,12 @@ AUTO-GENERATED! DO NOT MODIFY
 │           └── list
 │               └── arr.c
 ├── tmp
-│   ├── hash
-│   │   ├── hash.h
-│   │   └── slist.h
-│   └── list
-│       └── arr.h
+│   ├── list
+│   │   └── arr.h
+│   └── map
+│       └── hash
+│           ├── hash.h
+│           └── slist.h
 └── TODO
 
-22 directories, 28 files
+23 directories, 28 files

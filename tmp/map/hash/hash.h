@@ -1,7 +1,7 @@
 #ifndef CTL_HASH_H
 #define CTL_HASH_H
 
-#include "../../lib/include/util.h"
+#include "../../../lib/include/util.h"
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
