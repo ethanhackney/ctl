@@ -37,7 +37,7 @@ BEGIN {
 }
 
 # comment?
-/\*\*/ {
+/\/\*\*/ {
   in_comment = 1
   next
 }

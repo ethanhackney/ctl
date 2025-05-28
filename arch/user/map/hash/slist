@@ -58,31 +58,7 @@ public ${name}_free(struct ${name} *hsp, void (*dtor)(struct ${name}_kvp *))
 public ${name}_set_or_get(struct ${name} *hsp, ${ktype} key, size_t len, ${vtype} val)
 ======================================================================================
   info:
-  struct ${name}_slink *next = NULL;
- struct ${name}_slink *p = NULL;
- ctl_hash_size_t seen = 0;
- ctl_hash_size_t i = 0;
- ctl_hash_size_t j = 0;
-
- CTL_HASH_SLIST_OK(${name}, hsp);
-
- arr = calloc(cap, sizeof(*arr));
- if (arr == NULL)
- return -1;
-
- CTL_HASH_SLIST_FOR_EACH_SAFE(hsp, i, p, next, seen) {
- j = p->hash & (cap - 1);
- p->next = arr[j];
- arr[j] = p;
- }
-
- free(hsp->arr);
- hsp->arr = arr;
- hsp->cap = cap;
- return 0;
- }
-
-  set or get entry:
+   set or get entry
 
   args:
    @hsp: pointer to ${name}:
