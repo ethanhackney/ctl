@@ -7,20 +7,36 @@ AUTO-GENERATED! DO NOT MODIFY
 │   │   ├── env
 │   │   ├── list
 │   │   │   └── arr
+│   │   ├── map
+│   │   │   └── hash
+│   │   │       └── slist
 │   │   ├── pic
 │   │   └── tree
 │   └── user
-│       └── list
-│           └── arr
+│       ├── list
+│       │   └── arr
+│       └── map
+│           └── hash
+│               └── slist
 ├── bash
 │   └── lib
 ├── doc
 │   ├── doc
 │   ├── env.awk
 │   ├── hdr
-│   │   └── list
-│   │       └── arr
-│   └── tmp.awk
+│   │   ├── list
+│   │   │   └── arr
+│   │   └── map
+│   │       └── hash
+│   │           └── slist
+│   └── tmp
+│       ├── list
+│       │   ├── list
+│       │   └── list.awk
+│       └── map
+│           └── hash
+│               ├── hash
+│               └── hash.awk
 ├── env
 ├── lib
 │   ├── include
@@ -53,4 +69,4 @@ AUTO-GENERATED! DO NOT MODIFY
 │           └── slist.h
 └── TODO
 
-23 directories, 28 files
+33 directories, 34 files

@@ -197,7 +197,7 @@ struct _name {                                                          \
  *  @_vtype: value type of map
  *  @_name:  name of generated struct and prefix of function names
  */
-#define CTL_DO_HASH_SLIST_DEF(_link, _ktype, _vtype, _name)             \
+#define CTL_HASH_SLIST_DEF(_link, _ktype, _vtype, _name)                \
                                                                         \
 /**                                                                     \
  * initialize _name:                                                    \
@@ -303,7 +303,7 @@ _name ## _do_get(struct _name *hsp,                                     \
  * resize table:                                                        \
  *                                                                      \
  * args:                                                                \
- *  @hsp: pointer to _name:                                             \
+ *  @hsp: pointer to _name                                              \
  *  @cap: new capacity                                                  \
  *                                                                      \
  * ret:                                                                 \
@@ -492,7 +492,7 @@ _name ## _rm(struct _name *hsp,                                         \
                                                                         \
 CTL_HASH_SLIST_DECL(_ktype, _vtype, _name)                              \
 CTL_HASH_SLIST_PTR_HASH_DEF(_link, _ktype, _name)                       \
-CTL_DO_HASH_SLIST_DEF(_link, _ktype, _vtype, _name)
+CTL_HASH_SLIST_DEF(_link, _ktype, _vtype, _name)
 
 /**
  * define a new dynamic hash map with singly linked chaining:
@@ -507,6 +507,6 @@ CTL_DO_HASH_SLIST_DEF(_link, _ktype, _vtype, _name)
                                                                         \
 CTL_HASH_SLIST_DECL(_ktype, _vtype, _name)                              \
 CTL_HASH_SLIST_HASH_DEF(_link, _ktype, _name)                           \
-CTL_DO_HASH_SLIST_DEF(_link, _ktype, _vtype, _name)
+CTL_HASH_SLIST_DEF(_link, _ktype, _vtype, _name)
 
 #endif /* #ifndef CTL_HASH_SLIST_H */

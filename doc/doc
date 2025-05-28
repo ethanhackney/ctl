@@ -17,13 +17,13 @@ source "$CTL_ENV"
 source "$CTL_BASH_LIB"
 
 # verbose mode?
-v=0
+v=
 
 # parse args
 while [ $# -ne 0 ]; do
   case "$1" in
     -v|--verbose)
-      v=1
+      v='-v'
       shift
       ;;
     *)
@@ -39,7 +39,7 @@ done
 verbose() {
   local msg="$1"
 
-  if [ $v != 0 ]; then
+  if [ -n "$v" ]; then
     do_or_die echo "$(basename $0): $msg"
   fi
 }
@@ -50,20 +50,6 @@ verbose "switching to $docdir"
 cd "$docdir"
 
 verbose 'generating docs...'
-
-# templates
-tmps=(
-  'arr' # dynamic array
-)
-
-# template doc directories
-declare -A tmp_dir=(
-  [arr]='list'
-)
-
-for ((i = 0; i < ${#tmps[@]}; i++)); do
-  verbose "tmps[$i] = \"${tmps[i]}\""
-done
 
 # setup arch directory if needed
 verbose "setting up arch directory"
@@ -88,63 +74,5 @@ verbose "setting up user doc directory"
 mkdir_if_not "$CTL_ARCH/user"
 
 verbose 'generating doc for each template...'
-# for each template
-for ((i = 0; i < ${#tmps[@]}; i++)); do
-  tmp="${tmps[i]}"                   # template name
-  tmptype="${tmp_dir[$tmp]}"         # type of template
-  hdr="hdr/$tmptype/$tmp"            # template doc header
-  udir="$CTL_ARCH/user/$tmptype"     # user doc directory
-  idir="$CTL_ARCH/internal/$tmptype" # internal doc directory
-  tmpsrc="$CTL_TMP/$tmptype/$tmp.h"  # template source
-  func="CTL_${tmp^^}_DEF"            # template function name
-  idoc="$idir/$tmp"                  # internal doc
-  udoc="$udir/$tmp"                  # user doc
-
-  verbose "tmps[$i].name = \"$tmp\""
-  verbose "tmps[$i].func = \"$func\""
-  verbose "tmps[$i].udoc = \"$udoc\""
-  verbose "tmps[$i].idoc = \"$idoc\""
-  verbose "tmps[$i].hdr  = \"$hdr\""
-  verbose "tmps[$i].src  = \"$tmpsrc\""
-
-  # fail if no header
-  if ! [ -f "$hdr" ]; then
-    die "\"$tmp\" does not have a header yet"
-  fi
-
-  # setup user doc for template
-  verbose "setting up user doc directory for $tmp"
-  mkdir_if_not "$udir"
-
-  # setup internal doc for template
-  verbose "setting up internal doc directory for $tmp"
-  mkdir_if_not "$idir"
-
-  # write header to internal doc
-  verbose "copying \"$hdr\" to \"$idoc\""
-  do_or_die echo -e "$CTL_AUTO_GEN_MSG\n" >"$idoc"
-  do_or_die cat "$hdr" >>"$idoc"
-  do_or_die echo >>"$idoc"
-
-  # write header to user doc
-  verbose "copying \"$hdr\" to \"$udoc\""
-  do_or_die echo -e "$CTL_AUTO_GEN_MSG\n" >"$udoc"
-  do_or_die cat "$hdr" >>"$udoc"
-  do_or_die echo >>"$udoc"
-
-  # generate template doc
-  verbose "running \"./tmp.awk\" on \"$tmpsrc\" with FUNC=\"$func\", UDOC=\"$udoc\", IDOC=\"$idoc\""
-  do_or_die ./tmp.awk \
-    -v FUNC="$func"   \
-    -v UDOC="$udoc"   \
-    -v IDOC="$idoc"   \
-    "$tmpsrc"
-
-  verbose "removing last line in $udoc"
-  do_or_die sed -i '$d' "$udoc"
-
-  verbose "removing last line in $idoc"
-  do_or_die sed -i '$d' "$idoc"
-
-  verbose "\"$tmp\" doc created"
-done
+do_or_die ./tmp/list/list $v
+do_or_die ./tmp/map/hash/hash $v

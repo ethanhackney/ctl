@@ -14,7 +14,7 @@ args:
 ========================================
 private ${name}_grow(struct ${name} *ap)
 ========================================
-info:
+  info:
    grow ${name}
 
   args:
@@ -27,7 +27,7 @@ info:
 ==================================================
 private ${name}_grow_if_needed(struct ${name} *ap)
 ==================================================
-info:
+  info:
    grow ${name} if needed
 
   args:
@@ -40,7 +40,7 @@ info:
 ==========================================
 private ${name}_shrink(struct ${name} *ap)
 ==========================================
-info:
+  info:
    shrink ${name}
 
   args:
@@ -53,7 +53,7 @@ info:
 ====================================================
 private ${name}_shrink_if_needed(struct ${name} *ap)
 ====================================================
-info:
+  info:
    shrink ${name} if needed
 
   args:
@@ -66,7 +66,7 @@ info:
 =======================================================
 private ${name}_grow_by(struct ${name} *ap, size_t amt)
 =======================================================
-info:
+  info:
    grow ${name} by amount
 
   args:
@@ -80,7 +80,7 @@ info:
 =================================================================
 private ${name}_grow_by_if_needed(struct ${name} *ap, size_t amt)
 =================================================================
-info:
+  info:
    grow ${name} by amount if needed
 
   args:
@@ -94,7 +94,7 @@ info:
 =========================================================
 private ${name}_shrink_by(struct ${name} *ap, size_t amt)
 =========================================================
-info:
+  info:
    shrink ${name} by amount
 
   args:
@@ -108,7 +108,7 @@ info:
 ===================================================================
 private ${name}_shrink_by_if_needed(struct ${name} *ap, size_t amt)
 ===================================================================
-info:
+  info:
    shrink ${name} by amount if needed
 
   args:

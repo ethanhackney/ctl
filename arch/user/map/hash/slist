@@ -1,0 +1,126 @@
+AUTO-GENERATED! DO NOT MODIFY
+
+====================================================
+CTL_HASH_SLIST_PTR_KEY_DEF(link, ktype, vtype, name)
+====================================================
+
+infO:
+ singly linked hash map template for pointer keys
+
+args:
+ @link:  linkage of generated functions
+ @ktype: key type of array elements
+ @vtype: value type of array elements
+ @name:  name of generated struct and prefix of function names
+
+========================================================
+CTL_HASH_SLIST_NOT_PTR_KEY_DEF(link, ktype, vtype, name)
+========================================================
+
+infO:
+ singly linked hash map template for non-pointer keys
+
+args:
+ @link:  linkage of generated functions
+ @ktype: key type of array elements
+ @vtype: value type of array elements
+ @name:  name of generated struct and prefix of function names
+
+========================================================================================================================================
+public ${name}_init(struct ${name} *hsp, ctl_hash_size_t seed, int (*cmp)(const ${ktype} a, size_t alen, const ${ktype} b, size_t blen))
+========================================================================================================================================
+  info:
+   initialize ${name}
+
+  args:
+   @hsp:  pointer to ${name}:
+   @seed: seed
+   @cmp:  key compare
+    ret:
+     = 0 if a  = b
+     ! 0 if a != b
+
+  ret:
+   @success: 0
+   @failure: -1 and errno set
+
+============================================================================
+public ${name}_free(struct ${name} *hsp, void (*dtor)(struct ${name}_kvp *))
+============================================================================
+  info:
+   free ${name}
+
+  args:
+   @hsp:  pointer to ${name}
+   @dtor: optional destructor
+
+======================================================================================
+public ${name}_set_or_get(struct ${name} *hsp, ${ktype} key, size_t len, ${vtype} val)
+======================================================================================
+  info:
+  struct ${name}_slink *next = NULL;
+ struct ${name}_slink *p = NULL;
+ ctl_hash_size_t seen = 0;
+ ctl_hash_size_t i = 0;
+ ctl_hash_size_t j = 0;
+
+ CTL_HASH_SLIST_OK(${name}, hsp);
+
+ arr = calloc(cap, sizeof(*arr));
+ if (arr == NULL)
+ return -1;
+
+ CTL_HASH_SLIST_FOR_EACH_SAFE(hsp, i, p, next, seen) {
+ j = p->hash & (cap - 1);
+ p->next = arr[j];
+ arr[j] = p;
+ }
+
+ free(hsp->arr);
+ hsp->arr = arr;
+ hsp->cap = cap;
+ return 0;
+ }
+
+  set or get entry:
+
+  args:
+   @hsp: pointer to ${name}:
+   @key: key
+   @len: key length
+   @val: value
+
+  ret:
+   @success: 0
+   @failure: NULL and errno set
+
+=======================================================================
+public ${name}_get(struct ${name} *hsp, const ${ktype} key, size_t len)
+=======================================================================
+  info:
+   search for entry
+
+  args:
+   @hsp: pointer to ${name}
+   @key: key
+   @len: key length
+
+  ret:
+   @success: pointer to entry
+   @failure: NULL
+
+==========================================================================================================
+public ${name}_rm(struct ${name} *hsp, const ${ktype} key, size_t len, void (*dtor)(struct ${name}_kvp *))
+==========================================================================================================
+  info:
+   remove entry
+
+  args:
+   @hsp:  pointer to ${name}
+   @key:  key
+   @len:  key length
+   @dtor: optional destructor
+
+  ret:
+   @success: 0
+   @failure: -1 and errno set

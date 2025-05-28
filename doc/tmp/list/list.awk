@@ -3,15 +3,15 @@
 BEGIN {
   # make sure we got what we needed
   if (!FUNC) {
-    print "doc.awk: no function given"
+    print "list.awk: no function given"
     exit 1
   }
   if (!UDOC) {
-    print "doc.awk: no user doc file given"
+    print "list.awk: no user doc file given"
     exit 1
   }
   if (!IDOC) {
-    print "doc.awk: no internal doc file given"
+    print "list.awk: no internal doc file given"
     exit 1
   }
   # character used for barrier
@@ -74,7 +74,7 @@ in_sig && /\{/ {
   # first comment holds description of function
   info = comment[1]
   gsub(/:/, "", info)
-  print "info:" >>out
+  print "  info:" >>out
   print " " info >>out
 
   # print rest of comments
@@ -126,7 +126,7 @@ function barrier(n, out) {
 
 END {
   if (!found) {
-    print "doc.awk: could not find \"#define " FUNC "\""
+    print "list.awk: could not find \"#define " FUNC "\""
     exit 1
   }
 }

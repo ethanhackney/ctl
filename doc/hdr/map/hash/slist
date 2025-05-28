@@ -1,0 +1,25 @@
+====================================================
+CTL_HASH_SLIST_PTR_KEY_DEF(link, ktype, vtype, name)
+====================================================
+
+infO:
+ singly linked hash map template for pointer keys
+
+args:
+ @link:  linkage of generated functions
+ @ktype: key type of array elements
+ @vtype: value type of array elements
+ @name:  name of generated struct and prefix of function names
+
+========================================================
+CTL_HASH_SLIST_NOT_PTR_KEY_DEF(link, ktype, vtype, name)
+========================================================
+
+infO:
+ singly linked hash map template for non-pointer keys
+
+args:
+ @link:  linkage of generated functions
+ @ktype: key type of array elements
+ @vtype: value type of array elements
+ @name:  name of generated struct and prefix of function names
