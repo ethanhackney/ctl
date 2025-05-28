@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <string.h>
+#include "../../lib/include/util.h"
 
 /**
  * define a new array test:
@@ -128,8 +130,104 @@ again:                                                                          
 
 #include "do/list/arr.c"
 
+CTL_ARR_DEF(, char *, strarr)
+
+static void
+strarr_dtor(char *p)
+{
+        free(p);
+}
+
 int
 main(void)
 {
+        struct strarr arr = {0};
+        size_t idx = 0;
+        size_t i = 0;
+        FILE *fp = NULL;
+        char nil[] = "";
+        char buf[BUFSIZ] = "";
+        char *dup = NULL;
+        char **p = NULL;
+        int ret = 0;
+
         arr_test();
+
+        fp = fopen("/home/ethanhackney/code/ctl/lib/include/util.h", "r");
+        if (fp == NULL)
+                die("fopen");
+
+        if (strarr_init(&arr, 0) < 0)
+                die("strarr_init");
+
+        while (fgets(buf, sizeof(buf), fp) != NULL) {
+                dup = strdup(buf);
+                if (dup == NULL)
+                        die("strdup");
+
+                if (strarr_add(&arr, 0, dup) < 0)
+                        die("strarr_add");
+        }
+        if (ferror(fp))
+                die("fgets");
+
+        CTL_ARR_FOR_EACH(&arr, p) {
+                i = strarr_find(&arr, *p, strcmp);
+                if (i == strarr_len(&arr))
+                        die("strarr_find");
+        }
+        if (strarr_find(&arr, nil, strcmp) != strarr_len(&arr))
+                die("strarr_find");
+
+        if (strarr_rmv(&arr, 0, NULL, 5, strarr_dtor) < 0)
+                die("strarr_rmv");
+
+        strarr_sort(&arr, strcmp);
+        for (i = 0; i < strarr_len(&arr) - 1; i++) {
+                if (strcmp(arr.arr[i], arr.arr[i + 1]) > 0)
+                        die("arr not sorted after strarr_sort");
+        }
+
+        rewind(fp);
+        while (fgets(buf, sizeof(buf), fp) != NULL) {
+                dup = strdup(buf);
+                if (dup == NULL)
+                        die("strdup");
+
+                if (strarr_bin_add(&arr, dup, strcmp) < 0)
+                        die("strarr_add");
+        }
+        if (ferror(fp))
+                die("fgets");
+
+        for (i = 0; i < strarr_len(&arr) - 1; i++) {
+                if (strcmp(arr.arr[i], arr.arr[i + 1]) > 0)
+                        die("arr not sorted after strarr_bin_add");
+        }
+
+        CTL_ARR_FOR_EACH(&arr, p) {
+                idx = strarr_bin_find(&arr, *p, strcmp);
+                if (idx == strarr_len(&arr))
+                        die("strarr_bin_find");
+        }
+        if (strarr_bin_find(&arr, nil, strcmp) != strarr_len(&arr))
+                die("strarr_bin_find");
+
+        for (;;) {
+                idx = (size_t)rand() % strarr_len(&arr);
+                ret = strarr_rm(&arr, idx, NULL, strarr_dtor);
+
+                if (ret < 0)
+                        die("strarr_rm");
+                else if (ret > 0)
+                        break;
+                else if (strarr_len(&arr) == 0)
+                        break;
+        }
+
+        strarr_free(&arr, strarr_dtor);
+        fclose(fp);
+
+	printf("CTL_ARR_TEST_PASSED: strarr_test\n");
+	printf("CTL_ARR_TEST_PASSED\n");
 }

@@ -92,7 +92,7 @@ private ${name}_grow_by_if_needed(struct ${name} *ap, size_t amt)
    @failure: -1 and errno set
 
 =========================================================
-private ${name}_shrink_by(struct ${name} *ap, size_t amt)
+private ${name}_shrink_by(struct ${name} *ap, size_t cap)
 =========================================================
   info:
    shrink ${name} by amount

@@ -76,5 +76,4 @@ arr_test(void)
 	arr_test_union_arr_test((union arr_test_union){0}, 4096, NULL);
 	printf("CTL_ARR_TEST_PASSED: arr_test_union_arr_test\n");
 
-	printf("CTL_ARR_TEST_PASSED\n");
 }

@@ -4,6 +4,8 @@
 #include "../../lib/include/util.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+#include <errno.h>
 
 /* default initial capacity */
 #ifndef CTL_ARR_INIT_CAP
@@ -613,18 +615,14 @@ _name ## _grow_by_if_needed(struct _name *ap, size_t amt)       \
  *  @failure: -1 and errno set                                  \
  */                                                             \
 PRIVATE _link int                                               \
-_name ## _shrink_by(struct _name *ap, size_t amt)               \
+_name ## _shrink_by(struct _name *ap, size_t cap)               \
 {                                                               \
-        size_t cap = 0;                                         \
         _type *p = NULL;                                        \
                                                                 \
         CTL_ARR_OK(ap);                                         \
-        dbug(amt > ap->len, "amt > ap->len");                   \
+        dbug(cap > ap->cap, "cap > ap->cap");                   \
                                                                 \
-        /* shrink by amount */                                  \
-        cap = ap->cap - amt;                                    \
-        p = ap->arr;                                            \
-        p = realloc(p, sizeof(_type) * cap);                    \
+        p = realloc(ap->arr, sizeof(_type) * cap);              \
         if (p == NULL)                                          \
                 return -1;                                      \
                                                                 \
@@ -659,7 +657,7 @@ _name ## _shrink_by_if_needed(struct _name *ap, size_t amt)     \
         if (newlen < CTL_ARR_INIT_CAP)                          \
                 return 0;                                       \
                                                                 \
-        return _name ## _shrink_by(ap, amt);                    \
+        return _name ## _shrink_by(ap, newlen);                 \
 }                                                               \
                                                                 \
 /**                                                             \
@@ -756,12 +754,21 @@ _name ## _rmv(struct _name *ap,                                 \
                                                                 \
         CTL_ARR_OK(ap);                                         \
         dbug(idx >= ap->len, "idx >= len");                     \
+                                                                \
+        /* this is required even when not debugging because     \
+         * when gcc is optimizing, it will complain if it       \
+         * cannot 100% verify that memmove will not overflow    \
+         */                                                     \
+        if (idx + len > ap->len) {                              \
+                errno = EINVAL;                                 \
+                return -1;                                      \
+        }                                                       \
+                                                                \
         dbug(len == 0, "len == 0");                             \
         dbug(len > ap->len - idx,                               \
                      "len > ap->len - idx");                    \
-                                                                \
-        if (_name ## _shrink_by_if_needed(ap, len) < 0)         \
-                return -1;                                      \
+        dbug(len > ap->len, "len > ap->len");                   \
+        dbug(idx + len > ap->len, "idx + len > ap->len");       \
                                                                 \
         if (arr != NULL) {                                      \
                 src = ap->arr + idx;                            \
@@ -774,15 +781,18 @@ _name ## _rmv(struct _name *ap,                                 \
         }                                                       \
                                                                 \
         /* is there any thing left? */                          \
-        if (idx + len < ap->len) {                              \
+        if ((ap->len - (idx + len)) > 0) {                      \
                 /* shift down */                                \
-                src = ap->arr + idx;                            \
-                dst = src + len;                                \
-                shift = (ap->len - idx - len) * sizeof(_type);  \
-                memmove(dst, src, shift);                       \
+                src = ap->arr + idx + len;                      \
+                dst = ap->arr + idx;                            \
+                shift = (ap->len - (idx + len));                \
+                memmove(dst, src, shift * sizeof(_type));       \
         }                                                       \
                                                                 \
         ap->len -= len;                                         \
+        if (_name ## _shrink_by_if_needed(ap, 0) < 0)           \
+                return -1;                                      \
+                                                                \
         return 0;                                               \
 }                                                               \
                                                                 \

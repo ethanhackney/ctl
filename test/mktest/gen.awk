@@ -65,6 +65,5 @@ END {
       printf("\tprintf(\"CTL_ARR_TEST_PASSED: %s_test\\n\");\n", names[i,"name"])
     print ""
   }
-  printf("\tprintf(\"CTL_ARR_TEST_PASSED\\n\");\n")
   print "}"
 }
