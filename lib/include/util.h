@@ -49,11 +49,6 @@
  * args:
  *  @_name: function name prefix 
  *  @_type: type of arguments
- *
- * ret:
- *  < 0 if _a < _b
- *  = 0 if _a = _b
- *  > 0 if _a > _b
  */
 #define INT_CMP(_name, _type)                   \
 /**                                             \
@@ -64,9 +59,9 @@
  *  @b: second number                           \
  *                                              \
  * ret:                                         \
- *  < 0 if _a < _b                              \
- *  = 0 if _a = _b                              \
- *  > 0 if _a > _b                              \
+ *  < 0 if a < b                                \
+ *  = 0 if a = b                                \
+ *  > 0 if a > b                                \
  */                                             \
 static inline int                               \
 _name ## _cmp(const _type a, const _type b)     \
@@ -87,6 +82,51 @@ INT_CMP(s64, int64_t)
 INT_CMP(s32, int32_t)
 INT_CMP(s16, int16_t)
 INT_CMP(s8, int8_t)
+
+/**
+ * generate function to compare two numbers (used by maps && sets):
+ *
+ * args:
+ *  @_name: function name prefix 
+ *  @_type: type of arguments
+ */
+#define KEY_INT_CMP(_name, _type)               \
+/**                                             \
+ * compare two numbers:                         \
+ *                                              \
+ * args:                                        \
+ *  @a:     first number                        \
+ *  @asize: size of a                           \
+ *  @b:     second number                       \
+ *  @bsize: size of b                           \
+ *                                              \
+ * ret:                                         \
+ *  < 0 if a < b                                \
+ *  = 0 if a = b                                \
+ *  > 0 if a > b                                \
+ */                                             \
+static inline int                               \
+_name ## _key_cmp(const _type a,                \
+              size_t asize,                     \
+              const _type b,                    \
+              size_t bsize)                     \
+{                                               \
+        if (a < b)                              \
+                return -1;                      \
+        else if (a == b)                        \
+                return 0;                       \
+        else                                    \
+                return 1;                       \
+}
+
+KEY_INT_CMP(u64, uint64_t)
+KEY_INT_CMP(u32, uint32_t)
+KEY_INT_CMP(u16, uint16_t)
+KEY_INT_CMP(u8, uint8_t)
+KEY_INT_CMP(s64, int64_t)
+KEY_INT_CMP(s32, int32_t)
+KEY_INT_CMP(s16, int16_t)
+KEY_INT_CMP(s8, int8_t)
        
 /**
  * randomize contents of buffer:
