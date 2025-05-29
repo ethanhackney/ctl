@@ -139,7 +139,7 @@ strarr_dtor(char *p)
 }
 
 int
-main(void)
+main(int argc, char **argv)
 {
         struct strarr arr = {0};
         size_t idx = 0;
@@ -228,6 +228,8 @@ main(void)
         strarr_free(&arr, strarr_dtor);
         fclose(fp);
 
-	printf("CTL_ARR_TEST_PASSED: strarr_test\n");
+        if (argc == 1)
+                printf("CTL_ARR_TEST_PASSED: strarr_test\n");
+
 	printf("CTL_ARR_TEST_PASSED\n");
 }

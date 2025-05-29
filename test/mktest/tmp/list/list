@@ -104,7 +104,7 @@ verbose "compiling $t"
 do_or_die make >/dev/null
 
 # run it
-if ! time ./a.out; then
+if ! time ./a.out $silent; then
   die "unable to run $t"
 fi
 
