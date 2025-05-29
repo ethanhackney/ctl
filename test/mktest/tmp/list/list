@@ -1,0 +1,113 @@
+#!/bin/bash
+
+# bare minimum needed to work
+if [ -z "$CTL_ROOT" ]; then
+  echo "mkarrtest: CTL_ROOT undefined" 2>&1
+  exit 1
+fi
+if [ -z "$CTL_ENV" ]; then
+  echo "mkarrtest: CTL_ENV undefined" 2>&1
+  exit 1
+fi
+
+# grab environment
+source "$CTL_ENV"
+
+# bring in library
+source "$CTL_BASH_LIB"
+
+# silent mode?
+silent=0
+
+perf_test=0
+
+# verbose mode?
+v=0
+
+# parse args
+while [ $# -ne 0 ]; do
+  case "$1" in
+    -s|--silent)
+      silent=1
+      shift
+      ;;
+    -v|--verbose)
+      v=1
+      shift
+      ;;
+    -p|--perf)
+      perf_test=1
+      shift
+      ;;
+    -*)
+      arg_bad "$1"
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
+
+# print message if in verbose mode
+#
+# args:
+#  @msg: message
+verbose() {
+  local msg="$1"
+
+  if [ $v -ne 0 ]; then
+    do_or_die echo "$(basename $0): $msg"
+  fi
+}
+
+# switch to our directory
+docdir=$(dirname $0)
+cd "$docdir"
+
+t="arr.c"
+tmp_entry="$CTL_TEST/tmp/list/$t"
+verbose "generating arr header..."
+do_or_die echo -e "/* $CTL_AUTO_GEN_MSG */\n" >"$tmp_entry"
+do_or_die echo "#include \"$CTL_LIB_INCLUDE/util.h\"" >>"$tmp_entry"
+do_or_die echo "#include \"$CTL_TMP/list/arr.h\"" >>"$tmp_entry"
+do_or_die echo "#include <time.h>" >>"$tmp_entry"
+do_or_die echo -e "#include <stdlib.h>\n" >>"$tmp_entry"
+
+verbose "running list.awk"
+do_or_die ./list.awk -v SILENT=$silent \
+  "$CTL_MKTEST/tab/list/arr" >>"$CTL_TEST/tmp/list/arr.c"
+
+# is this a debugging test or a performance test?
+if [ "$perf_test" -eq 1 ]; then
+  verbose 'doing performance test'
+  cflags="$CTL_FAST_CFLAGS"
+else
+  verbose 'doing debug test'
+  cflags="$CTL_TEST_CFLAGS"
+fi
+
+trap "rm -f Makefile" EXIT
+
+# generate makefile
+verbose 'generating Makefile'
+cat >Makefile <<EOF
+main: $CTL_TEST/arr.c $CTL_LIB_SRC/util.c
+$(printf '\t')gcc $cflags \$^
+EOF
+
+if [ "$v" -eq 1 ]; then
+  do_or_die cat Makefile
+fi
+
+# compile test
+verbose "compiling $t"
+do_or_die make >/dev/null
+
+# run it
+if ! time ./a.out; then
+  die "unable to run $t"
+fi
+
+# remove files
+verbose 'removing files'
+do_or_die rm a.out Makefile

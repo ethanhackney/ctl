@@ -2,7 +2,8 @@ more comments
 linter
 document DBUG mode so users can enable it for safe checking
 create man page for CTL_ARR
+create man page for CTL_HASH_SLIST
 document macros  that can be defined by user
 add doc generator for struct def
-create array of strings test, the auto generator just does not work for that
+add hash_slist tests
 do the same for slist hash

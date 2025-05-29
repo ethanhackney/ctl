@@ -29,10 +29,10 @@ test_name() {
 }
 
 # verbose mode?
-v=0
+v=
 
 # performance test?
-perf_test=0
+perf_test=
 
 # silent mode?
 silent=
@@ -41,7 +41,7 @@ silent=
 while [ $# -ne 0 ]; do
   case "$1" in
     -v|--verbose)
-      v=1
+      v='-v'
       shift
       ;;
     -s|--silent)
@@ -49,7 +49,7 @@ while [ $# -ne 0 ]; do
       shift
       ;;
     -p|--perf)
-      perf_test=1
+      perf_test='-p'
       shift
       ;;
     *)
@@ -65,7 +65,7 @@ done
 verbose() {
   local msg="$1"
 
-  if [ $v -ne 0 ]; then
+  if [ -n "$v" ]; then
     do_or_die echo "$(basename $0): $msg"
   fi
 }
@@ -77,60 +77,61 @@ cd "$docdir"
 
 trap "rm -f a.out Makefile" EXIT
 
-verbose 'generating tests...'
+verbose 'generating template tests...'
+do_or_die ./mktest/tmp/list/list $v $silent $perf_test
 # for each test
-for t in $CTL_TEST/*.c; do
-  file="${t##*/}"
-  name="${file%.*}"
-
-  # make sure we match *.c
-  ext="${file##*.}"
-  if [ "$ext" != 'c' ]; then
-    echo "$path is not c source: bad extension" >&2
-    exit 1
-  fi
-
-  # make sure contents are c
-  ft=$(file "$t")
-  if [ "$ft" != "$t: C source, ASCII text" ]; then
-    echo "$t is not c source: contents not c" >&2
-    exit 1
-  fi
-
-  # generate test
-  verbose "generating test for $name"
-  do_or_die "$CTL_MKTEST/$name" "$silent"
-
-  # is this a debugging test or a performance test?
-  if [ "$perf_test" -eq 1 ]; then
-    verbose 'doing performance test'
-    cflags="$CTL_FAST_CFLAGS"
-  else
-    verbose 'doing debug test'
-    cflags="$CTL_TEST_CFLAGS"
-  fi
-
-  # generate makefile
-  verbose 'generating Makefile'
-cat >Makefile <<EOF
-main: $t $CTL_LIB_SRC/util.c
-$(printf '\t')gcc $cflags \$^
-EOF
-  if [ "$v" -eq 1 ]; then
-    do_or_die cat Makefile
-  fi
-
-  # compile test
-  verbose "compiling $t"
-  do_or_die make >/dev/null
-
-  # run it
-
-  if ! time ./a.out; then
-    die "unable to run $t"
-  fi
-
-  # remove files
-  verbose 'removing files'
-  do_or_die rm a.out Makefile
-done
+# for t in *; do
+#   file="${t##*/}"
+#   name="${file%.*}"
+# 
+#   # make sure we match *.c
+#   ext="${file##*.}"
+#   if [ "$ext" != 'c' ]; then
+#     echo "$path is not c source: bad extension" >&2
+#     exit 1
+#   fi
+# 
+#   # make sure contents are c
+#   ft=$(file "$t")
+#   if [ "$ft" != "$t: C source, ASCII text" ]; then
+#     echo "$t is not c source: contents not c" >&2
+#     exit 1
+#   fi
+# 
+#   # generate test
+#   verbose "generating test for $name"
+#   do_or_die "$CTL_MKTEST/$name" "$silent"
+# 
+#   # is this a debugging test or a performance test?
+#   if [ "$perf_test" -eq 1 ]; then
+#     verbose 'doing performance test'
+#     cflags="$CTL_FAST_CFLAGS"
+#   else
+#     verbose 'doing debug test'
+#     cflags="$CTL_TEST_CFLAGS"
+#   fi
+# 
+#   # generate makefile
+#   verbose 'generating Makefile'
+# cat >Makefile <<EOF
+# main: $t $CTL_LIB_SRC/util.c
+# $(printf '\t')gcc $cflags \$^
+# EOF
+#   if [ "$v" -eq 1 ]; then
+#     do_or_die cat Makefile
+#   fi
+# 
+#   # compile test
+#   verbose "compiling $t"
+#   do_or_die make >/dev/null
+# 
+#   # run it
+# 
+#   if ! time ./a.out; then
+#     die "unable to run $t"
+#   fi
+# 
+#   # remove files
+#   verbose 'removing files'
+#   do_or_die rm a.out Makefile
+# done

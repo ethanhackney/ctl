@@ -1,7 +1,6 @@
 AUTO-GENERATED! DO NOT MODIFY
 
 /home/ethanhackney/code/ctl
-├── a.out
 ├── arch
 │   ├── internal
 │   │   ├── env
@@ -49,18 +48,19 @@ AUTO-GENERATED! DO NOT MODIFY
 ├── run
 ├── test
 │   ├── mktest
-│   │   ├── arr
-│   │   ├── gen.awk
-│   │   └── tab
+│   │   ├── tab
+│   │   │   └── list
+│   │   │       └── arr
+│   │   └── tmp
 │   │       └── list
-│   │           └── arr
+│   │           ├── list
+│   │           └── list.awk
 │   ├── run
 │   └── test
 │       ├── arr.c
-│       └── do
+│       └── tmp
 │           └── list
 │               └── arr.c
-├── thing
 ├── tmp
 │   ├── list
 │   │   └── arr.h
@@ -70,4 +70,4 @@ AUTO-GENERATED! DO NOT MODIFY
 │           └── slist.h
 └── TODO
 
-33 directories, 35 files
+35 directories, 33 files

@@ -128,7 +128,7 @@ again:                                                                          
         _name ## _do_test(data, n, nil, dtor);                                  \
 }
 
-#include "do/list/arr.c"
+#include "tmp/list/arr.c"
 
 CTL_ARR_DEF(, char *, strarr)
 
