@@ -153,7 +153,7 @@ main(int argc, char **argv)
 
         arr_test();
 
-        fp = fopen("/home/ethanhackney/code/ctl/lib/include/util.h", "r");
+        fp = fopen("arr.c", "r");
         if (fp == NULL)
                 die("fopen");
 

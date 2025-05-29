@@ -69,6 +69,8 @@ trap "rm -f a.out Makefile" EXIT
 
 verbose 'generating template tests...'
 do_or_die ./mktest/tmp/list/list $v $silent $perf_test
+echo "***"
+do_or_die ./mktest/tmp/map/map $v $silent $perf_test
 # for each test
 # for t in *; do
 #   file="${t##*/}"

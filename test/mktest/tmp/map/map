@@ -54,18 +54,18 @@ verbose() {
 docdir=$(dirname $0)
 cd "$docdir"
 
-t="arr.c"
-tmp_entry="$CTL_TEST/tmp/list/do/$t"
-verbose "generating arr header..."
+t="slist.c"
+tmp_entry="$CTL_TEST/tmp/map/hash/do/$t"
+verbose "generating hash slist header..."
 do_or_die echo -e "/* $CTL_AUTO_GEN_MSG */\n" >"$tmp_entry"
 do_or_die echo "#include \"$CTL_LIB_INCLUDE/util.h\"" >>"$tmp_entry"
-do_or_die echo "#include \"$CTL_TMP/list/arr.h\"" >>"$tmp_entry"
+do_or_die echo "#include \"$CTL_TMP/map/hash/slist.h\"" >>"$tmp_entry"
 do_or_die echo "#include <time.h>" >>"$tmp_entry"
 do_or_die echo -e "#include <stdlib.h>\n" >>"$tmp_entry"
 
-verbose "running list.awk"
-do_or_die ./list.awk -v SILENT=$silent \
-  "$CTL_MKTEST/tab/list" >>"$CTL_TEST/tmp/list/do/arr.c"
+verbose "running map.awk"
+do_or_die ./map.awk -v SILENT=$silent \
+  "$CTL_MKTEST/tab/map" >>"$CTL_TEST/tmp/map/hash/do/slist.c"
 
 # is this a debugging test or a performance test?
 if [ -n "$perf_test" ]; then
@@ -81,7 +81,7 @@ trap "rm -f Makefile a.out" EXIT
 # generate makefile
 verbose 'generating Makefile'
 cat >Makefile <<EOF
-main: $CTL_TEST/tmp/list/arr.c $CTL_LIB_SRC/util.c
+main: $CTL_TEST/tmp/map/hash/slist.c $CTL_LIB_SRC/util.c
 $(printf '\t')gcc $cflags \$^
 EOF
 
@@ -92,10 +92,11 @@ fi
 # compile test
 verbose "compiling $t"
 do_or_die make >/dev/null
-do_or_die mv a.out $CTL_TEST/tmp/list/a.out
+do_or_die mv a.out $CTL_TEST/tmp/map/hash/a.out
 
-cd $CTL_TEST/tmp/list
+cd $CTL_TEST/tmp/map/hash
 # run it
+verbose "running test"
 if ! time ./a.out $silent; then
   rm a.out
   die "unable to run $t"
