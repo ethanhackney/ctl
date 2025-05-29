@@ -1,15 +1,5 @@
 #!/bin/bash
 
-# bare minimum needed to work
-if [ -z "$CTL_ROOT" ]; then
-  echo "mkarrtest: CTL_ROOT undefined" 2>&1
-  exit 1
-fi
-if [ -z "$CTL_ENV" ]; then
-  echo "mkarrtest: CTL_ENV undefined" 2>&1
-  exit 1
-fi
-
 # grab environment
 source "$CTL_ENV"
 
@@ -17,12 +7,12 @@ source "$CTL_ENV"
 source "$CTL_BASH_LIB"
 
 # silent mode?
-silent=0
+silent=
 
-perf_test=0
+perf_test=
 
 # verbose mode?
-v=0
+v=
 
 # parse args
 while [ $# -ne 0 ]; do
@@ -55,7 +45,7 @@ done
 verbose() {
   local msg="$1"
 
-  if [ $v -ne 0 ]; then
+  if [ -n "$v" ]; then
     do_or_die echo "$(basename $0): $msg"
   fi
 }
@@ -65,7 +55,7 @@ docdir=$(dirname $0)
 cd "$docdir"
 
 t="arr.c"
-tmp_entry="$CTL_TEST/tmp/list/$t"
+tmp_entry="$CTL_TEST/tmp/list/do/$t"
 verbose "generating arr header..."
 do_or_die echo -e "/* $CTL_AUTO_GEN_MSG */\n" >"$tmp_entry"
 do_or_die echo "#include \"$CTL_LIB_INCLUDE/util.h\"" >>"$tmp_entry"
@@ -75,10 +65,10 @@ do_or_die echo -e "#include <stdlib.h>\n" >>"$tmp_entry"
 
 verbose "running list.awk"
 do_or_die ./list.awk -v SILENT=$silent \
-  "$CTL_MKTEST/tab/list/arr" >>"$CTL_TEST/tmp/list/arr.c"
+  "$CTL_MKTEST/tab/list/arr" >>"$CTL_TEST/tmp/list/do/arr.c"
 
 # is this a debugging test or a performance test?
-if [ "$perf_test" -eq 1 ]; then
+if [ -n "$perf_test" ]; then
   verbose 'doing performance test'
   cflags="$CTL_FAST_CFLAGS"
 else
@@ -86,16 +76,16 @@ else
   cflags="$CTL_TEST_CFLAGS"
 fi
 
-trap "rm -f Makefile" EXIT
+trap "rm -f Makefile a.out" EXIT
 
 # generate makefile
 verbose 'generating Makefile'
 cat >Makefile <<EOF
-main: $CTL_TEST/arr.c $CTL_LIB_SRC/util.c
+main: $CTL_TEST/tmp/list/arr.c $CTL_LIB_SRC/util.c
 $(printf '\t')gcc $cflags \$^
 EOF
 
-if [ "$v" -eq 1 ]; then
+if [ -n "$v" ]; then
   do_or_die cat Makefile
 fi
 

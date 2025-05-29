@@ -1,67 +1,235 @@
-/* AUTO-GENERATED! DO NOT MODIFY */
+#include <stdio.h>
+#include <string.h>
+#include "../../../../lib/include/util.h"
 
-#include "/home/ethanhackney/code/ctl/lib/include/util.h"
-#include "/home/ethanhackney/code/ctl/tmp/list/arr.h"
-#include <time.h>
-#include <stdlib.h>
-
-struct arr_test_struct {
-	int a;
-	int b;
-	int c;
-};
-
-int
-arr_test_struct_cmp(const struct arr_test_struct a, const struct arr_test_struct b)
-{
-	return s64_cmp(a.a, b.a);
+/**
+ * define a new array test:
+ *
+ * args:
+ *  @_type:  type of elements
+ *  @_name:  struct name
+ *  @_never: value that cannot exist in array
+ *  @_cmp:   comparison function
+ *   ret:
+ *    < 0 if arg0 < arg1
+ *    = 0 if arg0 = arg1
+ *    > 0 if arg0 > arg1
+ */
+#define ARR_TEST(_type, _name, _cmp)                                            \
+CTL_ARR_DEF(, _type, _name)                                                     \
+/**                                                                             \
+ * do test on _name:                                                            \
+ *                                                                              \
+ * args:                                                                        \
+ *  @data: test data                                                            \
+ *  @n:    number of elements in data                                           \
+ *  @nil:  nil value (for testing failed searches)                              \
+ *  @dtor: optional destructor                                                  \
+ */                                                                             \
+PUBLIC void                                                                     \
+_name ## _do_test(_type *data,                                                  \
+                  size_t n,                                                     \
+                  _type nil,                                                    \
+                  void (*dtor)(_type))                                          \
+{                                                                               \
+        struct _name arr = {0};                                                 \
+        size_t idx = 0;                                                         \
+        size_t i = 0;                                                           \
+        _type rm[5];                                                            \
+        _type *p = NULL;                                                        \
+        _type v;                                                                \
+        int ret = 0;                                                            \
+                                                                                \
+        if (_name ## _init(&arr, 0) < 0)                                        \
+                die("%s_init", TO_STR(_name));                                  \
+                                                                                \
+        if (_name ## _addv(&arr, 0, data, n) < 0)                               \
+                die("%s_addv", TO_STR(_name));                                  \
+                                                                                \
+        if (_name ## _len(&arr) != n)                                           \
+                die("%s_addv did not update length");                           \
+                                                                                \
+        CTL_ARR_FOR_EACH(&arr, p) {                                             \
+                i = _name ## _find(&arr, *p, _cmp);                             \
+                if (i == _name ## _len(&arr))                                   \
+                        die("%s_find", TO_STR(_name));                          \
+        }                                                                       \
+        if (_name ## _find(&arr, nil, _cmp) != _name ## _len(&arr))             \
+                die("%s_find", TO_STR(_name));                                  \
+                                                                                \
+        if (_name ## _rmv(&arr, 0, rm, 5, dtor) < 0)                            \
+                die("%s_rmv", TO_STR(_name));                                   \
+                                                                                \
+        if (_name ## _rmv(&arr, 0, NULL, _name ## _len(&arr), dtor) < 0)        \
+                die("%s_rmv", TO_STR(_name));                                   \
+                                                                                \
+        if (_name ## _addv(&arr, 0, data, n) < 0)                               \
+                die("%s_addv", TO_STR(_name));                                  \
+                                                                                \
+        _name ## _sort(&arr, _cmp);                                             \
+        for (i = 0; i < _name ## _len(&arr) - 1; i++) {                         \
+                if (_cmp(arr.arr[i], arr.arr[i + 1]) > 0)                       \
+                        die("arr not sorted after %s_sort", TO_STR(_name));     \
+        }                                                                       \
+                                                                                \
+        for (p = data; (size_t)p < (size_t)data + n; p++) {                     \
+                if (_name ## _bin_add(&arr, *p, _cmp) < 0)                      \
+                        die("%s_bin_add", TO_STR(_name));                       \
+        }                                                                       \
+                                                                                \
+        for (i = 0; i < _name ## _len(&arr) - 1; i++) {                         \
+                if (_cmp(arr.arr[i], arr.arr[i + 1]) > 0)                       \
+                        die("arr not sorted after %s_bin_add", TO_STR(_name));  \
+        }                                                                       \
+                                                                                \
+        CTL_ARR_FOR_EACH(&arr, p) {                                             \
+                idx = _name ## _bin_find(&arr, *p, _cmp);                       \
+                if (idx == _name ## _len(&arr))                                 \
+                        die("%s_bin_find", TO_STR(_name));                      \
+        }                                                                       \
+        if (_name ## _bin_find(&arr, nil, _cmp) != _name ## _len(&arr))         \
+                die("%s_bin_find", TO_STR(_name));                              \
+                                                                                \
+        for (;;) {                                                              \
+                idx = (size_t)rand() % _name ## _len(&arr);                     \
+                ret = _name ## _rm(&arr, idx, &v, dtor);                        \
+                                                                                \
+                if (ret < 0)                                                    \
+                        die("%s_rm", TO_STR(_name));                            \
+                else if (ret > 0)                                               \
+                        break;                                                  \
+                else if (_name ## _len(&arr) == 0)                              \
+                        break;                                                  \
+        }                                                                       \
+                                                                                \
+        _name ## _free(&arr, NULL);                                             \
+}                                                                               \
+                                                                                \
+/**                                                                             \
+ * test _name:                                                                  \
+ *                                                                              \
+ * args:                                                                        \
+ *  @nil:  nil value                                                            \
+ *  @n:    number of elements in data                                           \
+ *  @dtor: optional destructor                                                  \
+ */                                                                             \
+PUBLIC void                                                                     \
+_name ## _test(_type nil, size_t n, void (*dtor)(_type))                        \
+{                                                                               \
+        _type data[n];                                                          \
+        size_t i = 0;                                                           \
+                                                                                \
+again:                                                                          \
+        buf_rand(data, sizeof(data));                                           \
+        for (i = 0; i < n; i++) {                                               \
+                if (_cmp(data[i], nil) == 0)                                    \
+                        goto again;                                             \
+        }                                                                       \
+        _name ## _do_test(data, n, nil, dtor);                                  \
 }
 
-union arr_test_union {
-	int a;
-	float b;
-	long c;
-};
+#include "do/arr.c"
 
-int
-arr_test_union_cmp(const union arr_test_union a, const union arr_test_union b)
+CTL_ARR_DEF(, char *, strarr)
+
+static void
+strarr_dtor(char *p)
 {
-	return s64_cmp(a.a, b.a);
+        free(p);
 }
 
-ARR_TEST(uint64_t, u64_arr, u64_cmp)
-ARR_TEST(uint32_t, u32_arr, u32_cmp)
-ARR_TEST(uint16_t, u16_arr, u16_cmp)
-ARR_TEST(uint8_t, u8_arr, u8_cmp)
-ARR_TEST(int64_t, s64_arr, s64_cmp)
-ARR_TEST(int32_t, s32_arr, s32_cmp)
-ARR_TEST(int16_t, s16_arr, s16_cmp)
-ARR_TEST(int8_t, s8_arr, s8_cmp)
-ARR_TEST(struct arr_test_struct, arr_test_struct_arr, arr_test_struct_cmp)
-ARR_TEST(union arr_test_union, arr_test_union_arr, arr_test_union_cmp)
-
-void
-arr_test(void)
+int
+main(int argc, char **argv)
 {
-	srand((unsigned int)time(NULL));
-	u64_arr_test((uint64_t)0, 4096, NULL);
+        struct strarr arr = {0};
+        size_t idx = 0;
+        size_t i = 0;
+        FILE *fp = NULL;
+        char nil[] = "";
+        char buf[BUFSIZ] = "";
+        char *dup = NULL;
+        char **p = NULL;
+        int ret = 0;
 
-	u32_arr_test((uint32_t)0, 4096, NULL);
+        arr_test();
 
-	u16_arr_test((uint16_t)0, 4096, NULL);
+        fp = fopen("/home/ethanhackney/code/ctl/lib/include/util.h", "r");
+        if (fp == NULL)
+                die("fopen");
 
-	u8_arr_test((uint8_t)0, 128, NULL);
+        if (strarr_init(&arr, 0) < 0)
+                die("strarr_init");
 
-	s64_arr_test((int64_t)0, 4096, NULL);
+        while (fgets(buf, sizeof(buf), fp) != NULL) {
+                dup = strdup(buf);
+                if (dup == NULL)
+                        die("strdup");
 
-	s32_arr_test((int32_t)0, 4096, NULL);
+                if (strarr_add(&arr, 0, dup) < 0)
+                        die("strarr_add");
+        }
+        if (ferror(fp))
+                die("fgets");
 
-	s16_arr_test((int16_t)0, 4096, NULL);
+        CTL_ARR_FOR_EACH(&arr, p) {
+                i = strarr_find(&arr, *p, strcmp);
+                if (i == strarr_len(&arr))
+                        die("strarr_find");
+        }
+        if (strarr_find(&arr, nil, strcmp) != strarr_len(&arr))
+                die("strarr_find");
 
-	s8_arr_test((int8_t)0, 128, NULL);
+        if (strarr_rmv(&arr, 0, NULL, 5, strarr_dtor) < 0)
+                die("strarr_rmv");
 
-	arr_test_struct_arr_test((struct arr_test_struct){0}, 4096, NULL);
+        strarr_sort(&arr, strcmp);
+        for (i = 0; i < strarr_len(&arr) - 1; i++) {
+                if (strcmp(arr.arr[i], arr.arr[i + 1]) > 0)
+                        die("arr not sorted after strarr_sort");
+        }
 
-	arr_test_union_arr_test((union arr_test_union){0}, 4096, NULL);
+        rewind(fp);
+        while (fgets(buf, sizeof(buf), fp) != NULL) {
+                dup = strdup(buf);
+                if (dup == NULL)
+                        die("strdup");
 
+                if (strarr_bin_add(&arr, dup, strcmp) < 0)
+                        die("strarr_add");
+        }
+        if (ferror(fp))
+                die("fgets");
+
+        for (i = 0; i < strarr_len(&arr) - 1; i++) {
+                if (strcmp(arr.arr[i], arr.arr[i + 1]) > 0)
+                        die("arr not sorted after strarr_bin_add");
+        }
+
+        CTL_ARR_FOR_EACH(&arr, p) {
+                idx = strarr_bin_find(&arr, *p, strcmp);
+                if (idx == strarr_len(&arr))
+                        die("strarr_bin_find");
+        }
+        if (strarr_bin_find(&arr, nil, strcmp) != strarr_len(&arr))
+                die("strarr_bin_find");
+
+        for (;;) {
+                idx = (size_t)rand() % strarr_len(&arr);
+                ret = strarr_rm(&arr, idx, NULL, strarr_dtor);
+
+                if (ret < 0)
+                        die("strarr_rm");
+                else if (ret > 0)
+                        break;
+                else if (strarr_len(&arr) == 0)
+                        break;
+        }
+
+        strarr_free(&arr, strarr_dtor);
+        fclose(fp);
+
+        if (argc == 1)
+                printf("CTL_ARR_TEST_PASSED: strarr_test\n");
+
+	printf("CTL_ARR_TEST_PASSED\n");
 }

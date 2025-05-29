@@ -1,15 +1,5 @@
 #!/bin/bash
 
-# bare minimum needed to work
-if [ -z "$CTL_ROOT" ]; then
-  echo "$(basename $0): CTL_ROOT undefined" 2>&1
-  exit 1
-fi
-if [ -z "$CTL_ENV" ]; then
-  echo "$(basename $0): CTL_ENV undefined" 2>&1
-  exit 1
-fi
-
 # grab environment
 source "$CTL_ENV"
 
